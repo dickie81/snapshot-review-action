@@ -23305,7 +23305,7 @@ const run = async () => {
       console.log('no diff');
       core.setOutput([]);
     } else {
-      core.setFailed(error.message);
+      core.setFailed(e.message);
     }
   } 
 }
