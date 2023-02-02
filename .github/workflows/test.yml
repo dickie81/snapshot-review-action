@@ -9,6 +9,7 @@ jobs:
       - name: Check snapshots
         uses: ./
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           snapshots-dir: 'test-snapshots'
           base-branch-name: ${{ github.base_ref }}
           branch-name: ${{ github.head_ref }}

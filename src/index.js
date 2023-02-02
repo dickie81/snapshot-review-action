@@ -12,12 +12,15 @@ const {
 } = require('jest-image-snapshot/src/diff-snapshot');
 const { rimraf } = require('rimraf');
 
+const tokenFromInput = core.getInput('token');
 const snapshotsDirectoryFromInput = core.getInput('snapshots-dir');
 const diffDir = './snapshot-diff';
 const baseBranchNameFromInput = core.getInput('base-branch-name');
 const branchNameFromInput = core.getInput('branch-name');
 const prNumberFromInput = core.getInput('pr-number');
 const reviewRepoRemotePathFromInputFromInput = core.getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
+
+const octokit = github.getOctokit(tokenFromInput)
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
@@ -77,6 +80,18 @@ const removeEmptyDirs = async (globPattern) => {
 
 const run = async () => {
   try {
+
+    const { data: pullRequest } = await octokit.rest.pulls.get({
+        owner: 'dickie81',
+        repo: 'snapshot-review-action',
+        pull_number: prNumberFromInput,
+        mediaType: {
+          format: 'diff'
+        }
+    });
+
+    console.log(pullRequest);
+
     const filePaths = await execCommand(
       `git --no-pager diff origin/${baseBranchNameFromInput}...origin/${branchNameFromInput} --name-only | grep ^${snapshotsDirectoryFromInput}`,
     );
