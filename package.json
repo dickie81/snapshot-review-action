@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "packager": "ncc build src/index.js --license LICENCE"
+    "packager": "ncc build src/index.js --license LICENSE"
   },
   "repository": {
     "type": "git",
