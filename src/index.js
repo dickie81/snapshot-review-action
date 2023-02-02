@@ -75,16 +75,15 @@ const removeEmptyDirs = async (globPattern) => {
   }
 };
 
-execCommand(
-  `git --no-pager diff origin/${baseBranchNameFromInput}...@ --name-only | grep ^${snapshotsDirectoryFromInput}`,
-)
-  .then(async (filePaths) => {
-    const branchName =
-      branchNameFromInput ||
-      (await execCommand('git rev-parse --abbrev-ref HEAD'))[0];
+const run = async () => {
+  try {
+    const filePaths = await execCommand(
+      `git --no-pager diff origin/${baseBranchNameFromInput}...@ --name-only | grep ^${snapshotsDirectoryFromInput}`,
+    );
+
     const originUrl = await execCommand('git config --get remote.origin.url');
     const origin = originUrl[0].split('.git')[0];
-    const prLink = prNumberFromInput ? `pull/${prNumberFromInput}` : `tree/${branchName}`;
+    const prLink = prNumberFromInput ? `pull/${prNumberFromInput}` : `tree/${branchNameFromInput}`;
 
     await deleteDir(diffDir);
 
@@ -182,15 +181,19 @@ execCommand(
     }
 
     fs.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-  })
-  .then(() => {
-    console.log('!!!done!!!');
-  })
-  .catch((e) => {
+    core.setOutput(filePaths);
+  } catch (e) {
     // exit code 1 for grep means "no match"
+    console.log("err", e)
+
     if (e.code === 1) {
       console.log('no diff');
+      core.setOutput([]);
     } else {
-      console.error(e);
+      core.setFailed(error.message);
     }
-  });
+  } 
+}
+
+run();
+
