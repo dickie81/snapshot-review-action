@@ -82,7 +82,7 @@ const run = async () => {
   try {
 
     const filePaths = await execCommand(
-      `gh pr diff ${prNumberFromInput} --name-only`,
+      `GH_TOKEN=${tokenFromInput} gh pr diff ${prNumberFromInput} --name-only`,
     );
 
     console.log("filePaths", filePaths);
