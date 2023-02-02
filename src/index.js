@@ -81,20 +81,11 @@ const removeEmptyDirs = async (globPattern) => {
 const run = async () => {
   try {
 
-    const { data: pullRequest } = await octokit.rest.pulls.get({
-        owner: 'dickie81',
-        repo: 'snapshot-review-action',
-        pull_number: prNumberFromInput,
-        mediaType: {
-          format: 'diff'
-        }
-    });
-
-    console.log(pullRequest);
-
     const filePaths = await execCommand(
-      `git --no-pager diff origin/${baseBranchNameFromInput}...origin/${branchNameFromInput} --name-only | grep ^${snapshotsDirectoryFromInput}`,
+      `gh pr diff ${prNumberFromInput} --name-only`,
     );
+
+    console.log("filePaths", filePaths);
 
     const originUrl = await execCommand('git config --get remote.origin.url');
     const origin = originUrl[0].split('.git')[0];
