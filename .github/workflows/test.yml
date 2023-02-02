@@ -1,0 +1,19 @@
+name: Automated tests
+on: [pull_request]
+jobs:
+  runs-snapshot-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check snapshots
+        uses: ./
+        with:
+          snapshots-dir: './test-snapshots'
+          base-branch-name: ${{ github.base_ref }}
+          branch-name: ${{ github.head_ref }}
+          pr-number: ${{ github.event.number }}
+          storybook-remote-path: 'dickie81/snapshot-review-action-snaps'
+
+
+ 

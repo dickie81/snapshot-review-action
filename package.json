@@ -1,0 +1,27 @@
+{
+  "name": "snapshot-review-action",
+  "version": "0.0.0",
+  "description": "A GitHub action that publishes snapshot changes for review for any given PR",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dickie81/snapshot-review-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dickie81/snapshot-review-action/issues"
+  },
+  "homepage": "https://github.com/dickie81/snapshot-review-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "glob": "^8.1.0",
+    "jest-image-snapshot": "5.1.1",
+    "rimraf": "^4.1.2"
+  }
+}
