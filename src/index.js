@@ -17,7 +17,7 @@ const diffDir = './snapshot-diff';
 const baseBranchNameFromInput = core.getInput('base-branch-name');
 const branchNameFromInput = core.getInput('branch-name');
 const prNumberFromInput = core.getInput('pr-number');
-const storybookRemotePathFromInput = core.getInput('storybook-remote-path') || '[STORYBOOK_REMOTE]';
+const reviewRepoRemotePathFromInputFromInput = core.getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
@@ -166,7 +166,7 @@ execCommand(
           ...(branchNameFromInput
             ? [
                 '',
-                `[View in storybook](https://raw.githack.com/${storybookRemotePathFromInput}/PR-${prNumberFromInput}-sb/index.html?path=/story/${storyId})`,
+                `[View in storybook](https://raw.githack.com/${reviewRepoRemotePathFromInputFromInput}/PR-${prNumberFromInput}-sb/index.html?path=/story/${storyId})`,
               ]
             : []),
         ].join('\n'),
