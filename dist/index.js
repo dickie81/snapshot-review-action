@@ -23187,7 +23187,7 @@ const removeEmptyDirs = async (globPattern) => {
 const run = async () => {
   try {
     const filePaths = await execCommand(
-      `git --no-pager diff origin/${baseBranchNameFromInput}...@ --name-only | grep ^${snapshotsDirectoryFromInput}`,
+      `git --no-pager diff origin/${baseBranchNameFromInput}...origin/${branchNameFromInput} --name-only | grep ^${snapshotsDirectoryFromInput}`,
     );
 
     const originUrl = await execCommand('git config --get remote.origin.url');
