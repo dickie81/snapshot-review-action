@@ -9,7 +9,7 @@ jobs:
       - name: Check snapshots
         uses: ./
         with:
-          snapshots-dir: './test-snapshots'
+          snapshots-dir: 'test-snapshots'
           base-branch-name: ${{ github.base_ref }}
           branch-name: ${{ github.head_ref }}
           pr-number: ${{ github.event.number }}
