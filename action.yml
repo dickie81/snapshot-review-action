@@ -6,23 +6,28 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
-  working-directory:
-    description: 'Relative path under $GITHUB_WORKSPACE where the repository was checked out.'
-    required: false
-  ref:
+  snapshots-dir:
+    description: 'Relative path under $GITHUB_WORKSPACE where your snapshots are located'
+    required: true
+  branch-name:
     description: |
       Git reference (e.g. branch name) from which the changes will be detected.
-      This option is ignored if action is triggered by pull_request event.
-    required: false
-  base:
+    required: true
+  base-branch-name:
     description: |
-      Git reference (e.g. branch name) against which the changes will be detected. Defaults to repository default branch (e.g. master).
-      If it references same branch it was pushed to, changes are detected against the most recent commit before the push.
-      This option is ignored if action is triggered by pull_request event.
-    required: false
+      Git reference (e.g. branch name) against which the changes will be detected.
+    required: true
+  pr-number:
+    description: |
+      The number of the PR that triggered this action
+    required: true
+  review-repo-remote-path:
+    description: |
+      The repo where the snapshot diffs will be published
+    required: true
 outputs:
   changes:
-    description: JSON array with names of all filters matching any of changed files
+    description: JSON array with paths of all files with snapshot changes detected
 runs:
   using: 'node16'
-  main: 'src/index.js'
+  main: 'dist/index.js'

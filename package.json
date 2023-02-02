@@ -2,9 +2,10 @@
   "name": "snapshot-review-action",
   "version": "0.0.0",
   "description": "A GitHub action that publishes snapshot changes for review for any given PR",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "packager": "ncc build src/index.js --license LICENCE"
   },
   "repository": {
     "type": "git",
