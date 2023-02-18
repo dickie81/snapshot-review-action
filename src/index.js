@@ -137,7 +137,9 @@ const run = async () => {
         };
 
         diffImageToSnapshot(diffOpts);
-      } catch {
+      } catch (x) {
+        console.log(x);
+
         // nothing on dev - new snapshot, just copy
         const origFilePath = path.join(__dirname, '..', filePath);
         const newFilePath = path.join(
@@ -176,6 +178,8 @@ const run = async () => {
     const updatedSnaps = [];
 
     const dirs = await globAsync(`${diffDir}/*`);
+
+    console.log("dirs", dirs);
 
     for (let i = 0; i < dirs.length; i++) {
       const dir = dirs[i];
