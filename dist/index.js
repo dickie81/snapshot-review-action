@@ -23158,6 +23158,8 @@ const run = async () => {
 
     const dirs = await globAsync(`${diffDir}/*`);
 
+    console.log("dirs", dirs);
+
     for (let i = 0; i < dirs.length; i++) {
       const dir = dirs[i];
       const storyId = dir.split('/').pop();
