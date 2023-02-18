@@ -16481,876 +16481,6 @@ SyncReader.prototype.process = function() {
 
 /***/ }),
 
-/***/ 8598:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.defaultTmpSync = exports.defaultTmp = void 0;
-// The default temporary folder location for use in the windows algorithm.
-// It's TEMPting to use dirname(path), since that's guaranteed to be on the
-// same device.  However, this means that:
-// rimraf(path).then(() => rimraf(dirname(path)))
-// will often fail with EBUSY, because the parent dir contains
-// marked-for-deletion directory entries (which do not show up in readdir).
-// The approach here is to use os.tmpdir() if it's on the same drive letter,
-// or resolve(path, '\\temp') if it exists, or the root of the drive if not.
-// On Posix (not that you'd be likely to use the windows algorithm there),
-// it uses os.tmpdir() always.
-const os_1 = __nccwpck_require__(2037);
-const path_1 = __nccwpck_require__(1017);
-const fs_js_1 = __nccwpck_require__(8151);
-const platform_js_1 = __importDefault(__nccwpck_require__(4828));
-const { stat } = fs_js_1.promises;
-const isDirSync = (path) => {
-    try {
-        return (0, fs_js_1.statSync)(path).isDirectory();
-    }
-    catch (er) {
-        return false;
-    }
-};
-const isDir = (path) => stat(path).then(st => st.isDirectory(), () => false);
-const win32DefaultTmp = async (path) => {
-    const { root } = (0, path_1.parse)(path);
-    const tmp = (0, os_1.tmpdir)();
-    const { root: tmpRoot } = (0, path_1.parse)(tmp);
-    if (root.toLowerCase() === tmpRoot.toLowerCase()) {
-        return tmp;
-    }
-    const driveTmp = (0, path_1.resolve)(root, '/temp');
-    if (await isDir(driveTmp)) {
-        return driveTmp;
-    }
-    return root;
-};
-const win32DefaultTmpSync = (path) => {
-    const { root } = (0, path_1.parse)(path);
-    const tmp = (0, os_1.tmpdir)();
-    const { root: tmpRoot } = (0, path_1.parse)(tmp);
-    if (root.toLowerCase() === tmpRoot.toLowerCase()) {
-        return tmp;
-    }
-    const driveTmp = (0, path_1.resolve)(root, '/temp');
-    if (isDirSync(driveTmp)) {
-        return driveTmp;
-    }
-    return root;
-};
-const posixDefaultTmp = async () => (0, os_1.tmpdir)();
-const posixDefaultTmpSync = () => (0, os_1.tmpdir)();
-exports.defaultTmp = platform_js_1.default === 'win32' ? win32DefaultTmp : posixDefaultTmp;
-exports.defaultTmpSync = platform_js_1.default === 'win32' ? win32DefaultTmpSync : posixDefaultTmpSync;
-//# sourceMappingURL=default-tmp.js.map
-
-/***/ }),
-
-/***/ 517:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fixEPERMSync = exports.fixEPERM = void 0;
-const fs_js_1 = __nccwpck_require__(8151);
-const { chmod } = fs_js_1.promises;
-const fixEPERM = (fn) => async (path) => {
-    try {
-        return await fn(path);
-    }
-    catch (er) {
-        const fer = er;
-        if (fer?.code === 'ENOENT') {
-            return;
-        }
-        if (fer?.code === 'EPERM') {
-            try {
-                await chmod(path, 0o666);
-            }
-            catch (er2) {
-                const fer2 = er2;
-                if (fer2?.code === 'ENOENT') {
-                    return;
-                }
-                throw er;
-            }
-            return await fn(path);
-        }
-        throw er;
-    }
-};
-exports.fixEPERM = fixEPERM;
-const fixEPERMSync = (fn) => (path) => {
-    try {
-        return fn(path);
-    }
-    catch (er) {
-        const fer = er;
-        if (fer?.code === 'ENOENT') {
-            return;
-        }
-        if (fer?.code === 'EPERM') {
-            try {
-                (0, fs_js_1.chmodSync)(path, 0o666);
-            }
-            catch (er2) {
-                const fer2 = er2;
-                if (fer2?.code === 'ENOENT') {
-                    return;
-                }
-                throw er;
-            }
-            return fn(path);
-        }
-        throw er;
-    }
-};
-exports.fixEPERMSync = fixEPERMSync;
-//# sourceMappingURL=fix-eperm.js.map
-
-/***/ }),
-
-/***/ 8151:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-// promisify ourselves, because older nodes don't have fs.promises
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.promises = exports.unlinkSync = exports.statSync = exports.rmSync = exports.rmdirSync = exports.renameSync = exports.readdirSync = exports.mkdirSync = exports.chmodSync = void 0;
-const fs_1 = __importDefault(__nccwpck_require__(7147));
-// sync ones just take the sync version from node
-var fs_2 = __nccwpck_require__(7147);
-Object.defineProperty(exports, "chmodSync", ({ enumerable: true, get: function () { return fs_2.chmodSync; } }));
-Object.defineProperty(exports, "mkdirSync", ({ enumerable: true, get: function () { return fs_2.mkdirSync; } }));
-Object.defineProperty(exports, "readdirSync", ({ enumerable: true, get: function () { return fs_2.readdirSync; } }));
-Object.defineProperty(exports, "renameSync", ({ enumerable: true, get: function () { return fs_2.renameSync; } }));
-Object.defineProperty(exports, "rmdirSync", ({ enumerable: true, get: function () { return fs_2.rmdirSync; } }));
-Object.defineProperty(exports, "rmSync", ({ enumerable: true, get: function () { return fs_2.rmSync; } }));
-Object.defineProperty(exports, "statSync", ({ enumerable: true, get: function () { return fs_2.statSync; } }));
-Object.defineProperty(exports, "unlinkSync", ({ enumerable: true, get: function () { return fs_2.unlinkSync; } }));
-// unrolled for better inlining, this seems to get better performance
-// than something like:
-// const makeCb = (res, rej) => (er, ...d) => er ? rej(er) : res(...d)
-// which would be a bit cleaner.
-const chmod = (path, mode) => new Promise((res, rej) => fs_1.default.chmod(path, mode, (er, ...d) => (er ? rej(er) : res(...d))));
-const mkdir = (path, options) => new Promise((res, rej) => fs_1.default.mkdir(path, options, (er, made) => (er ? rej(er) : res(made))));
-const readdir = (path) => new Promise((res, rej) => fs_1.default.readdir(path, (er, data) => (er ? rej(er) : res(data))));
-const rename = (oldPath, newPath) => new Promise((res, rej) => fs_1.default.rename(oldPath, newPath, (er, ...d) => (er ? rej(er) : res(...d))));
-const rm = (path, options) => new Promise((res, rej) => fs_1.default.rm(path, options, (er, ...d) => (er ? rej(er) : res(...d))));
-const rmdir = (path) => new Promise((res, rej) => fs_1.default.rmdir(path, (er, ...d) => (er ? rej(er) : res(...d))));
-const stat = (path) => new Promise((res, rej) => fs_1.default.stat(path, (er, data) => (er ? rej(er) : res(data))));
-const unlink = (path) => new Promise((res, rej) => fs_1.default.unlink(path, (er, ...d) => (er ? rej(er) : res(...d))));
-exports.promises = {
-    chmod,
-    mkdir,
-    readdir,
-    rename,
-    rm,
-    rmdir,
-    stat,
-    unlink,
-};
-//# sourceMappingURL=fs.js.map
-
-/***/ }),
-
-/***/ 9864:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ignoreENOENTSync = exports.ignoreENOENT = void 0;
-const ignoreENOENT = async (p) => p.catch(er => {
-    if (er.code !== 'ENOENT') {
-        throw er;
-    }
-});
-exports.ignoreENOENT = ignoreENOENT;
-const ignoreENOENTSync = (fn) => {
-    try {
-        return fn();
-    }
-    catch (er) {
-        if (er?.code !== 'ENOENT') {
-            throw er;
-        }
-    }
-};
-exports.ignoreENOENTSync = ignoreENOENTSync;
-//# sourceMappingURL=ignore-enoent.js.map
-
-/***/ }),
-
-/***/ 5245:
-/***/ (function(module, __unused_webpack_exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-const index_js_1 = __importDefault(__nccwpck_require__(677));
-module.exports = Object.assign(index_js_1.default, { default: index_js_1.default });
-//# sourceMappingURL=index-cjs.js.map
-
-/***/ }),
-
-/***/ 677:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.rimraf = exports.sync = exports.rimrafSync = exports.moveRemove = exports.moveRemoveSync = exports.posix = exports.posixSync = exports.windows = exports.windowsSync = exports.manual = exports.manualSync = exports.native = exports.nativeSync = exports.assertRimrafOptions = exports.isRimrafOptions = void 0;
-const opt_arg_js_1 = __importDefault(__nccwpck_require__(3175));
-const path_arg_js_1 = __importDefault(__nccwpck_require__(6322));
-const typeOrUndef = (val, t) => typeof val === 'undefined' || typeof val === t;
-const isRimrafOptions = (o) => !!o &&
-    typeof o === 'object' &&
-    typeOrUndef(o.preserveRoot, 'boolean') &&
-    typeOrUndef(o.tmp, 'string') &&
-    typeOrUndef(o.maxRetries, 'number') &&
-    typeOrUndef(o.retryDelay, 'number') &&
-    typeOrUndef(o.backoff, 'number') &&
-    typeOrUndef(o.maxBackoff, 'number');
-exports.isRimrafOptions = isRimrafOptions;
-const assertRimrafOptions = (o) => {
-    if (!(0, exports.isRimrafOptions)(o)) {
-        throw new Error('invalid rimraf options');
-    }
-};
-exports.assertRimrafOptions = assertRimrafOptions;
-const rimraf_manual_js_1 = __nccwpck_require__(6816);
-const rimraf_move_remove_js_1 = __nccwpck_require__(357);
-const rimraf_native_js_1 = __nccwpck_require__(9871);
-const rimraf_posix_js_1 = __nccwpck_require__(2664);
-const rimraf_windows_js_1 = __nccwpck_require__(2252);
-const use_native_js_1 = __nccwpck_require__(3875);
-const wrap = (fn) => async (path, opt) => {
-    const options = (0, opt_arg_js_1.default)(opt);
-    await (Array.isArray(path)
-        ? Promise.all(path.map(p => fn((0, path_arg_js_1.default)(p, options), options)))
-        : fn((0, path_arg_js_1.default)(path, options), options));
-};
-const wrapSync = (fn) => (path, opt) => {
-    const options = (0, opt_arg_js_1.default)(opt);
-    return Array.isArray(path)
-        ? path.forEach(p => fn((0, path_arg_js_1.default)(p, options), options))
-        : fn((0, path_arg_js_1.default)(path, options), options);
-};
-exports.nativeSync = wrapSync(rimraf_native_js_1.rimrafNativeSync);
-exports.native = Object.assign(wrap(rimraf_native_js_1.rimrafNative), { sync: exports.nativeSync });
-exports.manualSync = wrapSync(rimraf_manual_js_1.rimrafManualSync);
-exports.manual = Object.assign(wrap(rimraf_manual_js_1.rimrafManual), { sync: exports.manualSync });
-exports.windowsSync = wrapSync(rimraf_windows_js_1.rimrafWindowsSync);
-exports.windows = Object.assign(wrap(rimraf_windows_js_1.rimrafWindows), { sync: exports.windowsSync });
-exports.posixSync = wrapSync(rimraf_posix_js_1.rimrafPosixSync);
-exports.posix = Object.assign(wrap(rimraf_posix_js_1.rimrafPosix), { sync: exports.posixSync });
-exports.moveRemoveSync = wrapSync(rimraf_move_remove_js_1.rimrafMoveRemoveSync);
-exports.moveRemove = Object.assign(wrap(rimraf_move_remove_js_1.rimrafMoveRemove), {
-    sync: exports.moveRemoveSync,
-});
-exports.rimrafSync = wrapSync((path, opt) => (0, use_native_js_1.useNativeSync)() ? (0, rimraf_native_js_1.rimrafNativeSync)(path, opt) : (0, rimraf_manual_js_1.rimrafManualSync)(path, opt));
-exports.sync = exports.rimrafSync;
-exports.rimraf = Object.assign(wrap((path, opt) => (0, use_native_js_1.useNative)() ? (0, rimraf_native_js_1.rimrafNative)(path, opt) : (0, rimraf_manual_js_1.rimrafManual)(path, opt)), {
-    // this weirdness because it's easier than explicitly declaring
-    rimraf: exports.manual,
-    sync: exports.rimrafSync,
-    rimrafSync: exports.rimrafSync,
-    manual: exports.manual,
-    manualSync: exports.manualSync,
-    native: exports.native,
-    nativeSync: exports.nativeSync,
-    posix: exports.posix,
-    posixSync: exports.posixSync,
-    windows: exports.windows,
-    windowsSync: exports.windowsSync,
-    moveRemove: exports.moveRemove,
-    moveRemoveSync: exports.moveRemoveSync,
-});
-exports.rimraf.rimraf = exports.rimraf;
-exports["default"] = exports.rimraf;
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ 3175:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const index_js_1 = __nccwpck_require__(677);
-exports["default"] = (opt = {}) => {
-    (0, index_js_1.assertRimrafOptions)(opt);
-    return opt;
-};
-//# sourceMappingURL=opt-arg.js.map
-
-/***/ }),
-
-/***/ 6322:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const platform_js_1 = __importDefault(__nccwpck_require__(4828));
-const path_1 = __nccwpck_require__(1017);
-const util_1 = __nccwpck_require__(3837);
-const pathArg = (path, opt = {}) => {
-    const type = typeof path;
-    if (type !== 'string') {
-        const ctor = path && type === 'object' && path.constructor;
-        const received = ctor && ctor.name
-            ? `an instance of ${ctor.name}`
-            : type === 'object'
-                ? (0, util_1.inspect)(path)
-                : `type ${type} ${path}`;
-        const msg = 'The "path" argument must be of type string. ' + `Received ${received}`;
-        throw Object.assign(new TypeError(msg), {
-            path,
-            code: 'ERR_INVALID_ARG_TYPE',
-        });
-    }
-    if (/\0/.test(path)) {
-        // simulate same failure that node raises
-        const msg = 'path must be a string without null bytes';
-        throw Object.assign(new TypeError(msg), {
-            path,
-            code: 'ERR_INVALID_ARG_VALUE',
-        });
-    }
-    path = (0, path_1.resolve)(path);
-    const { root } = (0, path_1.parse)(path);
-    if (path === root && opt.preserveRoot !== false) {
-        const msg = 'refusing to remove root directory without preserveRoot:false';
-        throw Object.assign(new Error(msg), {
-            path,
-            code: 'ERR_PRESERVE_ROOT',
-        });
-    }
-    if (platform_js_1.default === 'win32') {
-        const badWinChars = /[*|"<>?:]/;
-        const { root } = (0, path_1.parse)(path);
-        if (badWinChars.test(path.substring(root.length))) {
-            throw Object.assign(new Error('Illegal characters in path.'), {
-                path,
-                code: 'EINVAL',
-            });
-        }
-    }
-    return path;
-};
-exports["default"] = pathArg;
-//# sourceMappingURL=path-arg.js.map
-
-/***/ }),
-
-/***/ 4828:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports["default"] = process.env.__TESTING_RIMRAF_PLATFORM__ || process.platform;
-//# sourceMappingURL=platform.js.map
-
-/***/ }),
-
-/***/ 7038:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.readdirOrErrorSync = exports.readdirOrError = void 0;
-// returns an array of entries if readdir() works,
-// or the error that readdir() raised if not.
-const fs_js_1 = __nccwpck_require__(8151);
-const { readdir } = fs_js_1.promises;
-const readdirOrError = (path) => readdir(path).catch(er => er);
-exports.readdirOrError = readdirOrError;
-const readdirOrErrorSync = (path) => {
-    try {
-        return (0, fs_js_1.readdirSync)(path);
-    }
-    catch (er) {
-        return er;
-    }
-};
-exports.readdirOrErrorSync = readdirOrErrorSync;
-//# sourceMappingURL=readdir-or-error.js.map
-
-/***/ }),
-
-/***/ 892:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-// note: max backoff is the maximum that any *single* backoff will do
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryBusySync = exports.retryBusy = exports.codes = exports.MAXRETRIES = exports.RATE = exports.MAXBACKOFF = void 0;
-exports.MAXBACKOFF = 200;
-exports.RATE = 1.2;
-exports.MAXRETRIES = 10;
-exports.codes = new Set(['EMFILE', 'ENFILE', 'EBUSY']);
-const retryBusy = (fn) => {
-    const method = async (path, opt, backoff = 1, total = 0) => {
-        const mbo = opt.maxBackoff || exports.MAXBACKOFF;
-        const rate = opt.backoff || exports.RATE;
-        const max = opt.maxRetries || exports.MAXRETRIES;
-        let retries = 0;
-        while (true) {
-            try {
-                return await fn(path);
-            }
-            catch (er) {
-                const fer = er;
-                if (fer?.path === path && fer?.code && exports.codes.has(fer.code)) {
-                    backoff = Math.ceil(backoff * rate);
-                    total = backoff + total;
-                    if (total < mbo) {
-                        return new Promise((res, rej) => {
-                            setTimeout(() => {
-                                method(path, opt, backoff, total).then(res, rej);
-                            }, backoff);
-                        });
-                    }
-                    if (retries < max) {
-                        retries++;
-                        continue;
-                    }
-                }
-                throw er;
-            }
-        }
-    };
-    return method;
-};
-exports.retryBusy = retryBusy;
-// just retries, no async so no backoff
-const retryBusySync = (fn) => {
-    const method = (path, opt) => {
-        const max = opt.maxRetries || exports.MAXRETRIES;
-        let retries = 0;
-        while (true) {
-            try {
-                return fn(path);
-            }
-            catch (er) {
-                const fer = er;
-                if (fer?.path === path &&
-                    fer?.code &&
-                    exports.codes.has(fer.code) &&
-                    retries < max) {
-                    retries++;
-                    continue;
-                }
-                throw er;
-            }
-        }
-    };
-    return method;
-};
-exports.retryBusySync = retryBusySync;
-//# sourceMappingURL=retry-busy.js.map
-
-/***/ }),
-
-/***/ 6816:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.rimrafManualSync = exports.rimrafManual = void 0;
-const platform_js_1 = __importDefault(__nccwpck_require__(4828));
-const rimraf_posix_js_1 = __nccwpck_require__(2664);
-const rimraf_windows_js_1 = __nccwpck_require__(2252);
-exports.rimrafManual = platform_js_1.default === 'win32' ? rimraf_windows_js_1.rimrafWindows : rimraf_posix_js_1.rimrafPosix;
-exports.rimrafManualSync = platform_js_1.default === 'win32' ? rimraf_windows_js_1.rimrafWindowsSync : rimraf_posix_js_1.rimrafPosixSync;
-//# sourceMappingURL=rimraf-manual.js.map
-
-/***/ }),
-
-/***/ 357:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-// https://youtu.be/uhRWMGBjlO8?t=537
-//
-// 1. readdir
-// 2. for each entry
-//   a. if a non-empty directory, recurse
-//   b. if an empty directory, move to random hidden file name in $TEMP
-//   c. unlink/rmdir $TEMP
-//
-// This works around the fact that unlink/rmdir is non-atomic and takes
-// a non-deterministic amount of time to complete.
-//
-// However, it is HELLA SLOW, like 2-10x slower than a naive recursive rm.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.rimrafMoveRemoveSync = exports.rimrafMoveRemove = void 0;
-const path_1 = __nccwpck_require__(1017);
-const default_tmp_js_1 = __nccwpck_require__(8598);
-const ignore_enoent_js_1 = __nccwpck_require__(9864);
-const fs_js_1 = __nccwpck_require__(8151);
-const { rename, unlink, rmdir, chmod } = fs_js_1.promises;
-const readdir_or_error_js_1 = __nccwpck_require__(7038);
-// crypto.randomBytes is much slower, and Math.random() is enough here
-const uniqueFilename = (path) => `.${(0, path_1.basename)(path)}.${Math.random()}`;
-const unlinkFixEPERM = async (path) => unlink(path).catch((er) => {
-    if (er.code === 'EPERM') {
-        return chmod(path, 0o666).then(() => unlink(path), er2 => {
-            if (er2.code === 'ENOENT') {
-                return;
-            }
-            throw er;
-        });
-    }
-    else if (er.code === 'ENOENT') {
-        return;
-    }
-    throw er;
-});
-const unlinkFixEPERMSync = (path) => {
-    try {
-        (0, fs_js_1.unlinkSync)(path);
-    }
-    catch (er) {
-        if (er?.code === 'EPERM') {
-            try {
-                return (0, fs_js_1.chmodSync)(path, 0o666);
-            }
-            catch (er2) {
-                if (er2?.code === 'ENOENT') {
-                    return;
-                }
-                throw er;
-            }
-        }
-        else if (er?.code === 'ENOENT') {
-            return;
-        }
-        throw er;
-    }
-};
-const rimrafMoveRemove = async (path, opt) => {
-    if (!opt.tmp) {
-        return (0, exports.rimrafMoveRemove)(path, { ...opt, tmp: await (0, default_tmp_js_1.defaultTmp)(path) });
-    }
-    if (path === opt.tmp && (0, path_1.parse)(path).root !== path) {
-        throw new Error('cannot delete temp directory used for deletion');
-    }
-    const entries = await (0, readdir_or_error_js_1.readdirOrError)(path);
-    if (!Array.isArray(entries)) {
-        if (entries.code === 'ENOENT') {
-            return;
-        }
-        if (entries.code !== 'ENOTDIR') {
-            throw entries;
-        }
-        return await (0, ignore_enoent_js_1.ignoreENOENT)(tmpUnlink(path, opt.tmp, unlinkFixEPERM));
-    }
-    await Promise.all(entries.map(entry => (0, exports.rimrafMoveRemove)((0, path_1.resolve)(path, entry), opt)));
-    // we don't ever ACTUALLY try to unlink /, because that can never work
-    // but when preserveRoot is false, we could be operating on it.
-    // No need to check if preserveRoot is not false.
-    if (opt.preserveRoot === false && path === (0, path_1.parse)(path).root) {
-        return;
-    }
-    return await (0, ignore_enoent_js_1.ignoreENOENT)(tmpUnlink(path, opt.tmp, rmdir));
-};
-exports.rimrafMoveRemove = rimrafMoveRemove;
-const tmpUnlink = async (path, tmp, rm) => {
-    const tmpFile = (0, path_1.resolve)(tmp, uniqueFilename(path));
-    await rename(path, tmpFile);
-    return await rm(tmpFile);
-};
-const rimrafMoveRemoveSync = (path, opt) => {
-    if (!opt.tmp) {
-        return (0, exports.rimrafMoveRemoveSync)(path, { ...opt, tmp: (0, default_tmp_js_1.defaultTmpSync)(path) });
-    }
-    const tmp = opt.tmp;
-    if (path === opt.tmp && (0, path_1.parse)(path).root !== path) {
-        throw new Error('cannot delete temp directory used for deletion');
-    }
-    const entries = (0, readdir_or_error_js_1.readdirOrErrorSync)(path);
-    if (!Array.isArray(entries)) {
-        if (entries.code === 'ENOENT') {
-            return;
-        }
-        if (entries.code !== 'ENOTDIR') {
-            throw entries;
-        }
-        return (0, ignore_enoent_js_1.ignoreENOENTSync)(() => tmpUnlinkSync(path, tmp, unlinkFixEPERMSync));
-    }
-    for (const entry of entries) {
-        (0, exports.rimrafMoveRemoveSync)((0, path_1.resolve)(path, entry), opt);
-    }
-    if (opt.preserveRoot === false && path === (0, path_1.parse)(path).root) {
-        return;
-    }
-    return (0, ignore_enoent_js_1.ignoreENOENTSync)(() => tmpUnlinkSync(path, tmp, fs_js_1.rmdirSync));
-};
-exports.rimrafMoveRemoveSync = rimrafMoveRemoveSync;
-const tmpUnlinkSync = (path, tmp, rmSync) => {
-    const tmpFile = (0, path_1.resolve)(tmp, uniqueFilename(path));
-    (0, fs_js_1.renameSync)(path, tmpFile);
-    return rmSync(tmpFile);
-};
-//# sourceMappingURL=rimraf-move-remove.js.map
-
-/***/ }),
-
-/***/ 9871:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.rimrafNativeSync = exports.rimrafNative = void 0;
-const fs_js_1 = __nccwpck_require__(8151);
-const { rm } = fs_js_1.promises;
-const rimrafNative = (path, opt) => rm(path, {
-    ...opt,
-    force: true,
-    recursive: true,
-});
-exports.rimrafNative = rimrafNative;
-const rimrafNativeSync = (path, opt) => (0, fs_js_1.rmSync)(path, {
-    ...opt,
-    force: true,
-    recursive: true,
-});
-exports.rimrafNativeSync = rimrafNativeSync;
-//# sourceMappingURL=rimraf-native.js.map
-
-/***/ }),
-
-/***/ 2664:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-// the simple recursive removal, where unlink and rmdir are atomic
-// Note that this approach does NOT work on Windows!
-// We rmdir before unlink even though that is arguably less efficient
-// (since the average folder contains >1 file, it means more system
-// calls), because sunos will let root unlink a directory, and some
-// SUPER weird breakage happens as a result.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.rimrafPosixSync = exports.rimrafPosix = void 0;
-const fs_js_1 = __nccwpck_require__(8151);
-const { rmdir, unlink } = fs_js_1.promises;
-const path_1 = __nccwpck_require__(1017);
-const readdir_or_error_js_1 = __nccwpck_require__(7038);
-const ignore_enoent_js_1 = __nccwpck_require__(9864);
-const rimrafPosix = async (path, opt) => {
-    const entries = await (0, readdir_or_error_js_1.readdirOrError)(path);
-    if (!Array.isArray(entries)) {
-        if (entries.code === 'ENOENT') {
-            return;
-        }
-        if (entries.code !== 'ENOTDIR') {
-            throw entries;
-        }
-        return (0, ignore_enoent_js_1.ignoreENOENT)(unlink(path));
-    }
-    await Promise.all(entries.map(entry => (0, exports.rimrafPosix)((0, path_1.resolve)(path, entry), opt)));
-    // we don't ever ACTUALLY try to unlink /, because that can never work
-    // but when preserveRoot is false, we could be operating on it.
-    // No need to check if preserveRoot is not false.
-    if (opt.preserveRoot === false && path === (0, path_1.parse)(path).root) {
-        return;
-    }
-    return (0, ignore_enoent_js_1.ignoreENOENT)(rmdir(path));
-};
-exports.rimrafPosix = rimrafPosix;
-const rimrafPosixSync = (path, opt) => {
-    const entries = (0, readdir_or_error_js_1.readdirOrErrorSync)(path);
-    if (!Array.isArray(entries)) {
-        if (entries.code === 'ENOENT') {
-            return;
-        }
-        if (entries.code !== 'ENOTDIR') {
-            throw entries;
-        }
-        return (0, ignore_enoent_js_1.ignoreENOENTSync)(() => (0, fs_js_1.unlinkSync)(path));
-    }
-    for (const entry of entries) {
-        (0, exports.rimrafPosixSync)((0, path_1.resolve)(path, entry), opt);
-    }
-    if (opt.preserveRoot === false && path === (0, path_1.parse)(path).root) {
-        return;
-    }
-    return (0, ignore_enoent_js_1.ignoreENOENTSync)(() => (0, fs_js_1.rmdirSync)(path));
-};
-exports.rimrafPosixSync = rimrafPosixSync;
-//# sourceMappingURL=rimraf-posix.js.map
-
-/***/ }),
-
-/***/ 2252:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-// This is the same as rimrafPosix, with the following changes:
-//
-// 1. EBUSY, ENFILE, EMFILE trigger retries and/or exponential backoff
-// 2. All non-directories are removed first and then all directories are
-//    removed in a second sweep.
-// 3. If we hit ENOTEMPTY in the second sweep, fall back to move-remove on
-//    the that folder.
-//
-// Note: "move then remove" is 2-10 times slower, and just as unreliable.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.rimrafWindowsSync = exports.rimrafWindows = void 0;
-const path_1 = __nccwpck_require__(1017);
-const ignore_enoent_js_1 = __nccwpck_require__(9864);
-const fix_eperm_js_1 = __nccwpck_require__(517);
-const readdir_or_error_js_1 = __nccwpck_require__(7038);
-const retry_busy_js_1 = __nccwpck_require__(892);
-const rimraf_move_remove_js_1 = __nccwpck_require__(357);
-const fs_js_1 = __nccwpck_require__(8151);
-const { unlink, rmdir } = fs_js_1.promises;
-const rimrafWindowsFile = (0, retry_busy_js_1.retryBusy)((0, fix_eperm_js_1.fixEPERM)(unlink));
-const rimrafWindowsFileSync = (0, retry_busy_js_1.retryBusySync)((0, fix_eperm_js_1.fixEPERMSync)(fs_js_1.unlinkSync));
-const rimrafWindowsDir = (0, retry_busy_js_1.retryBusy)((0, fix_eperm_js_1.fixEPERM)(rmdir));
-const rimrafWindowsDirSync = (0, retry_busy_js_1.retryBusySync)((0, fix_eperm_js_1.fixEPERMSync)(fs_js_1.rmdirSync));
-const rimrafWindowsDirMoveRemoveFallback = async (path, opt) => {
-    try {
-        await rimrafWindowsDir(path, opt);
-    }
-    catch (er) {
-        if (er?.code === 'ENOTEMPTY') {
-            return await (0, rimraf_move_remove_js_1.rimrafMoveRemove)(path, opt);
-        }
-        throw er;
-    }
-};
-const rimrafWindowsDirMoveRemoveFallbackSync = (path, opt) => {
-    try {
-        rimrafWindowsDirSync(path, opt);
-    }
-    catch (er) {
-        if (er?.code === 'ENOTEMPTY') {
-            return (0, rimraf_move_remove_js_1.rimrafMoveRemoveSync)(path, opt);
-        }
-        throw er;
-    }
-};
-const START = Symbol('start');
-const CHILD = Symbol('child');
-const FINISH = Symbol('finish');
-const states = new Set([START, CHILD, FINISH]);
-const rimrafWindows = async (path, opt, state = START) => {
-    if (!states.has(state)) {
-        throw new TypeError('invalid third argument passed to rimraf');
-    }
-    const entries = await (0, readdir_or_error_js_1.readdirOrError)(path);
-    if (!Array.isArray(entries)) {
-        if (entries.code === 'ENOENT') {
-            return;
-        }
-        if (entries.code !== 'ENOTDIR') {
-            throw entries;
-        }
-        // is a file
-        return (0, ignore_enoent_js_1.ignoreENOENT)(rimrafWindowsFile(path, opt));
-    }
-    await Promise.all(entries.map(entry => (0, exports.rimrafWindows)((0, path_1.resolve)(path, entry), opt, state === START ? CHILD : state)));
-    if (state === START) {
-        return (0, exports.rimrafWindows)(path, opt, FINISH);
-    }
-    else if (state === FINISH) {
-        if (opt.preserveRoot === false && path === (0, path_1.parse)(path).root) {
-            return;
-        }
-        return (0, ignore_enoent_js_1.ignoreENOENT)(rimrafWindowsDirMoveRemoveFallback(path, opt));
-    }
-};
-exports.rimrafWindows = rimrafWindows;
-const rimrafWindowsSync = (path, opt, state = START) => {
-    if (!states.has(state)) {
-        throw new TypeError('invalid third argument passed to rimraf');
-    }
-    const entries = (0, readdir_or_error_js_1.readdirOrErrorSync)(path);
-    if (!Array.isArray(entries)) {
-        if (entries.code === 'ENOENT') {
-            return;
-        }
-        if (entries.code !== 'ENOTDIR') {
-            throw entries;
-        }
-        // is a file
-        return (0, ignore_enoent_js_1.ignoreENOENTSync)(() => rimrafWindowsFileSync(path, opt));
-    }
-    for (const entry of entries) {
-        const s = state === START ? CHILD : state;
-        (0, exports.rimrafWindowsSync)((0, path_1.resolve)(path, entry), opt, s);
-    }
-    if (state === START) {
-        return (0, exports.rimrafWindowsSync)(path, opt, FINISH);
-    }
-    else if (state === FINISH) {
-        if (opt.preserveRoot === false && path === (0, path_1.parse)(path).root) {
-            return;
-        }
-        return (0, ignore_enoent_js_1.ignoreENOENTSync)(() => {
-            rimrafWindowsDirMoveRemoveFallbackSync(path, opt);
-        });
-    }
-};
-exports.rimrafWindowsSync = rimrafWindowsSync;
-//# sourceMappingURL=rimraf-windows.js.map
-
-/***/ }),
-
-/***/ 3875:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.useNativeSync = exports.useNative = void 0;
-const version = process.env.__TESTING_RIMRAF_NODE_VERSION__ || process.version;
-const versArr = version.replace(/^v/, '').split('.');
-const hasNative = +versArr[0] > 14 || (+versArr[0] === 14 && +versArr[1] >= 14);
-// we do NOT use native by default on Windows, because Node's native
-// rm implementation is less advanced.  Change this code if that changes.
-const platform_js_1 = __importDefault(__nccwpck_require__(4828));
-exports.useNative = !hasNative || platform_js_1.default === 'win32' ? () => false : () => true;
-exports.useNativeSync = !hasNative || platform_js_1.default === 'win32' ? () => false : () => true;
-//# sourceMappingURL=use-native.js.map
-
-/***/ }),
-
 /***/ 6468:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -23099,31 +22229,762 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: external "child_process"
+var external_child_process_ = __nccwpck_require__(2081);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
+var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
+// EXTERNAL MODULE: ./node_modules/glob/glob.js
+var glob = __nccwpck_require__(5001);
+var glob_default = /*#__PURE__*/__nccwpck_require__.n(glob);
+// EXTERNAL MODULE: ./node_modules/jest-image-snapshot/src/diff-snapshot.js
+var diff_snapshot = __nccwpck_require__(3316);
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/opt-arg.js
+
+/* harmony default export */ const opt_arg = ((opt = {}) => {
+    assertRimrafOptions(opt);
+    return opt;
+});
+//# sourceMappingURL=opt-arg.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/platform.js
+/* harmony default export */ const platform = (process.env.__TESTING_RIMRAF_PLATFORM__ || process.platform);
+//# sourceMappingURL=platform.js.map
+// EXTERNAL MODULE: external "util"
+var external_util_ = __nccwpck_require__(3837);
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/path-arg.js
+
+
+
+const pathArg = (path, opt = {}) => {
+    const type = typeof path;
+    if (type !== 'string') {
+        const ctor = path && type === 'object' && path.constructor;
+        const received = ctor && ctor.name
+            ? `an instance of ${ctor.name}`
+            : type === 'object'
+                ? (0,external_util_.inspect)(path)
+                : `type ${type} ${path}`;
+        const msg = 'The "path" argument must be of type string. ' + `Received ${received}`;
+        throw Object.assign(new TypeError(msg), {
+            path,
+            code: 'ERR_INVALID_ARG_TYPE',
+        });
+    }
+    if (/\0/.test(path)) {
+        // simulate same failure that node raises
+        const msg = 'path must be a string without null bytes';
+        throw Object.assign(new TypeError(msg), {
+            path,
+            code: 'ERR_INVALID_ARG_VALUE',
+        });
+    }
+    path = (0,external_path_.resolve)(path);
+    const { root } = (0,external_path_.parse)(path);
+    if (path === root && opt.preserveRoot !== false) {
+        const msg = 'refusing to remove root directory without preserveRoot:false';
+        throw Object.assign(new Error(msg), {
+            path,
+            code: 'ERR_PRESERVE_ROOT',
+        });
+    }
+    if (platform === 'win32') {
+        const badWinChars = /[*|"<>?:]/;
+        const { root } = (0,external_path_.parse)(path);
+        if (badWinChars.test(path.substring(root.length))) {
+            throw Object.assign(new Error('Illegal characters in path.'), {
+                path,
+                code: 'EINVAL',
+            });
+        }
+    }
+    return path;
+};
+/* harmony default export */ const path_arg = (pathArg);
+//# sourceMappingURL=path-arg.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/fs.js
+// promisify ourselves, because older nodes don't have fs.promises
+
+// sync ones just take the sync version from node
+
+// unrolled for better inlining, this seems to get better performance
+// than something like:
+// const makeCb = (res, rej) => (er, ...d) => er ? rej(er) : res(...d)
+// which would be a bit cleaner.
+const chmod = (path, mode) => new Promise((res, rej) => external_fs_.chmod(path, mode, (er, ...d) => (er ? rej(er) : res(...d))));
+const mkdir = (path, options) => new Promise((res, rej) => external_fs_.mkdir(path, options, (er, made) => (er ? rej(er) : res(made))));
+const readdir = (path) => new Promise((res, rej) => external_fs_.readdir(path, (er, data) => (er ? rej(er) : res(data))));
+const rename = (oldPath, newPath) => new Promise((res, rej) => external_fs_.rename(oldPath, newPath, (er, ...d) => (er ? rej(er) : res(...d))));
+const rm = (path, options) => new Promise((res, rej) => external_fs_.rm(path, options, (er, ...d) => (er ? rej(er) : res(...d))));
+const rmdir = (path) => new Promise((res, rej) => external_fs_.rmdir(path, (er, ...d) => (er ? rej(er) : res(...d))));
+const stat = (path) => new Promise((res, rej) => external_fs_.stat(path, (er, data) => (er ? rej(er) : res(data))));
+const unlink = (path) => new Promise((res, rej) => external_fs_.unlink(path, (er, ...d) => (er ? rej(er) : res(...d))));
+const promises = {
+    chmod,
+    mkdir,
+    readdir,
+    rename,
+    rm,
+    rmdir,
+    stat,
+    unlink,
+};
+//# sourceMappingURL=fs.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/readdir-or-error.js
+// returns an array of entries if readdir() works,
+// or the error that readdir() raised if not.
+
+const { readdir: readdir_or_error_readdir } = promises;
+const readdirOrError = (path) => readdir_or_error_readdir(path).catch(er => er);
+const readdirOrErrorSync = (path) => {
+    try {
+        return (0,external_fs_.readdirSync)(path);
+    }
+    catch (er) {
+        return er;
+    }
+};
+//# sourceMappingURL=readdir-or-error.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/ignore-enoent.js
+const ignoreENOENT = async (p) => p.catch(er => {
+    if (er.code !== 'ENOENT') {
+        throw er;
+    }
+});
+const ignoreENOENTSync = (fn) => {
+    try {
+        return fn();
+    }
+    catch (er) {
+        if (er?.code !== 'ENOENT') {
+            throw er;
+        }
+    }
+};
+//# sourceMappingURL=ignore-enoent.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/rimraf-posix.js
+// the simple recursive removal, where unlink and rmdir are atomic
+// Note that this approach does NOT work on Windows!
+// We rmdir before unlink even though that is arguably less efficient
+// (since the average folder contains >1 file, it means more system
+// calls), because sunos will let root unlink a directory, and some
+// SUPER weird breakage happens as a result.
+
+const { rmdir: rimraf_posix_rmdir, unlink: rimraf_posix_unlink } = promises;
+
+
+
+const rimrafPosix = async (path, opt) => {
+    const entries = await readdirOrError(path);
+    if (!Array.isArray(entries)) {
+        if (entries.code === 'ENOENT') {
+            return;
+        }
+        if (entries.code !== 'ENOTDIR') {
+            throw entries;
+        }
+        return ignoreENOENT(rimraf_posix_unlink(path));
+    }
+    await Promise.all(entries.map(entry => rimrafPosix((0,external_path_.resolve)(path, entry), opt)));
+    // we don't ever ACTUALLY try to unlink /, because that can never work
+    // but when preserveRoot is false, we could be operating on it.
+    // No need to check if preserveRoot is not false.
+    if (opt.preserveRoot === false && path === (0,external_path_.parse)(path).root) {
+        return;
+    }
+    return ignoreENOENT(rimraf_posix_rmdir(path));
+};
+const rimrafPosixSync = (path, opt) => {
+    const entries = readdirOrErrorSync(path);
+    if (!Array.isArray(entries)) {
+        if (entries.code === 'ENOENT') {
+            return;
+        }
+        if (entries.code !== 'ENOTDIR') {
+            throw entries;
+        }
+        return ignoreENOENTSync(() => (0,external_fs_.unlinkSync)(path));
+    }
+    for (const entry of entries) {
+        rimrafPosixSync((0,external_path_.resolve)(path, entry), opt);
+    }
+    if (opt.preserveRoot === false && path === (0,external_path_.parse)(path).root) {
+        return;
+    }
+    return ignoreENOENTSync(() => (0,external_fs_.rmdirSync)(path));
+};
+//# sourceMappingURL=rimraf-posix.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/fix-eperm.js
+
+const { chmod: fix_eperm_chmod } = promises;
+const fixEPERM = (fn) => async (path) => {
+    try {
+        return await fn(path);
+    }
+    catch (er) {
+        const fer = er;
+        if (fer?.code === 'ENOENT') {
+            return;
+        }
+        if (fer?.code === 'EPERM') {
+            try {
+                await fix_eperm_chmod(path, 0o666);
+            }
+            catch (er2) {
+                const fer2 = er2;
+                if (fer2?.code === 'ENOENT') {
+                    return;
+                }
+                throw er;
+            }
+            return await fn(path);
+        }
+        throw er;
+    }
+};
+const fixEPERMSync = (fn) => (path) => {
+    try {
+        return fn(path);
+    }
+    catch (er) {
+        const fer = er;
+        if (fer?.code === 'ENOENT') {
+            return;
+        }
+        if (fer?.code === 'EPERM') {
+            try {
+                (0,external_fs_.chmodSync)(path, 0o666);
+            }
+            catch (er2) {
+                const fer2 = er2;
+                if (fer2?.code === 'ENOENT') {
+                    return;
+                }
+                throw er;
+            }
+            return fn(path);
+        }
+        throw er;
+    }
+};
+//# sourceMappingURL=fix-eperm.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/retry-busy.js
+// note: max backoff is the maximum that any *single* backoff will do
+const MAXBACKOFF = 200;
+const RATE = 1.2;
+const MAXRETRIES = 10;
+const codes = new Set(['EMFILE', 'ENFILE', 'EBUSY']);
+const retryBusy = (fn) => {
+    const method = async (path, opt, backoff = 1, total = 0) => {
+        const mbo = opt.maxBackoff || MAXBACKOFF;
+        const rate = opt.backoff || RATE;
+        const max = opt.maxRetries || MAXRETRIES;
+        let retries = 0;
+        while (true) {
+            try {
+                return await fn(path);
+            }
+            catch (er) {
+                const fer = er;
+                if (fer?.path === path && fer?.code && codes.has(fer.code)) {
+                    backoff = Math.ceil(backoff * rate);
+                    total = backoff + total;
+                    if (total < mbo) {
+                        return new Promise((res, rej) => {
+                            setTimeout(() => {
+                                method(path, opt, backoff, total).then(res, rej);
+                            }, backoff);
+                        });
+                    }
+                    if (retries < max) {
+                        retries++;
+                        continue;
+                    }
+                }
+                throw er;
+            }
+        }
+    };
+    return method;
+};
+// just retries, no async so no backoff
+const retryBusySync = (fn) => {
+    const method = (path, opt) => {
+        const max = opt.maxRetries || MAXRETRIES;
+        let retries = 0;
+        while (true) {
+            try {
+                return fn(path);
+            }
+            catch (er) {
+                const fer = er;
+                if (fer?.path === path &&
+                    fer?.code &&
+                    codes.has(fer.code) &&
+                    retries < max) {
+                    retries++;
+                    continue;
+                }
+                throw er;
+            }
+        }
+    };
+    return method;
+};
+//# sourceMappingURL=retry-busy.js.map
+// EXTERNAL MODULE: external "os"
+var external_os_ = __nccwpck_require__(2037);
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/default-tmp.js
+// The default temporary folder location for use in the windows algorithm.
+// It's TEMPting to use dirname(path), since that's guaranteed to be on the
+// same device.  However, this means that:
+// rimraf(path).then(() => rimraf(dirname(path)))
+// will often fail with EBUSY, because the parent dir contains
+// marked-for-deletion directory entries (which do not show up in readdir).
+// The approach here is to use os.tmpdir() if it's on the same drive letter,
+// or resolve(path, '\\temp') if it exists, or the root of the drive if not.
+// On Posix (not that you'd be likely to use the windows algorithm there),
+// it uses os.tmpdir() always.
+
+
+
+
+const { stat: default_tmp_stat } = promises;
+const isDirSync = (path) => {
+    try {
+        return (0,external_fs_.statSync)(path).isDirectory();
+    }
+    catch (er) {
+        return false;
+    }
+};
+const isDir = (path) => default_tmp_stat(path).then(st => st.isDirectory(), () => false);
+const win32DefaultTmp = async (path) => {
+    const { root } = (0,external_path_.parse)(path);
+    const tmp = (0,external_os_.tmpdir)();
+    const { root: tmpRoot } = (0,external_path_.parse)(tmp);
+    if (root.toLowerCase() === tmpRoot.toLowerCase()) {
+        return tmp;
+    }
+    const driveTmp = (0,external_path_.resolve)(root, '/temp');
+    if (await isDir(driveTmp)) {
+        return driveTmp;
+    }
+    return root;
+};
+const win32DefaultTmpSync = (path) => {
+    const { root } = (0,external_path_.parse)(path);
+    const tmp = (0,external_os_.tmpdir)();
+    const { root: tmpRoot } = (0,external_path_.parse)(tmp);
+    if (root.toLowerCase() === tmpRoot.toLowerCase()) {
+        return tmp;
+    }
+    const driveTmp = (0,external_path_.resolve)(root, '/temp');
+    if (isDirSync(driveTmp)) {
+        return driveTmp;
+    }
+    return root;
+};
+const posixDefaultTmp = async () => (0,external_os_.tmpdir)();
+const posixDefaultTmpSync = () => (0,external_os_.tmpdir)();
+const defaultTmp = platform === 'win32' ? win32DefaultTmp : posixDefaultTmp;
+const defaultTmpSync = platform === 'win32' ? win32DefaultTmpSync : posixDefaultTmpSync;
+//# sourceMappingURL=default-tmp.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/rimraf-move-remove.js
+// https://youtu.be/uhRWMGBjlO8?t=537
+//
+// 1. readdir
+// 2. for each entry
+//   a. if a non-empty directory, recurse
+//   b. if an empty directory, move to random hidden file name in $TEMP
+//   c. unlink/rmdir $TEMP
+//
+// This works around the fact that unlink/rmdir is non-atomic and takes
+// a non-deterministic amount of time to complete.
+//
+// However, it is HELLA SLOW, like 2-10x slower than a naive recursive rm.
+
+
+
+
+const { rename: rimraf_move_remove_rename, unlink: rimraf_move_remove_unlink, rmdir: rimraf_move_remove_rmdir, chmod: rimraf_move_remove_chmod } = promises;
+
+// crypto.randomBytes is much slower, and Math.random() is enough here
+const uniqueFilename = (path) => `.${(0,external_path_.basename)(path)}.${Math.random()}`;
+const unlinkFixEPERM = async (path) => rimraf_move_remove_unlink(path).catch((er) => {
+    if (er.code === 'EPERM') {
+        return rimraf_move_remove_chmod(path, 0o666).then(() => rimraf_move_remove_unlink(path), er2 => {
+            if (er2.code === 'ENOENT') {
+                return;
+            }
+            throw er;
+        });
+    }
+    else if (er.code === 'ENOENT') {
+        return;
+    }
+    throw er;
+});
+const unlinkFixEPERMSync = (path) => {
+    try {
+        (0,external_fs_.unlinkSync)(path);
+    }
+    catch (er) {
+        if (er?.code === 'EPERM') {
+            try {
+                return (0,external_fs_.chmodSync)(path, 0o666);
+            }
+            catch (er2) {
+                if (er2?.code === 'ENOENT') {
+                    return;
+                }
+                throw er;
+            }
+        }
+        else if (er?.code === 'ENOENT') {
+            return;
+        }
+        throw er;
+    }
+};
+const rimrafMoveRemove = async (path, opt) => {
+    if (!opt.tmp) {
+        return rimrafMoveRemove(path, { ...opt, tmp: await defaultTmp(path) });
+    }
+    if (path === opt.tmp && (0,external_path_.parse)(path).root !== path) {
+        throw new Error('cannot delete temp directory used for deletion');
+    }
+    const entries = await readdirOrError(path);
+    if (!Array.isArray(entries)) {
+        if (entries.code === 'ENOENT') {
+            return;
+        }
+        if (entries.code !== 'ENOTDIR') {
+            throw entries;
+        }
+        return await ignoreENOENT(tmpUnlink(path, opt.tmp, unlinkFixEPERM));
+    }
+    await Promise.all(entries.map(entry => rimrafMoveRemove((0,external_path_.resolve)(path, entry), opt)));
+    // we don't ever ACTUALLY try to unlink /, because that can never work
+    // but when preserveRoot is false, we could be operating on it.
+    // No need to check if preserveRoot is not false.
+    if (opt.preserveRoot === false && path === (0,external_path_.parse)(path).root) {
+        return;
+    }
+    return await ignoreENOENT(tmpUnlink(path, opt.tmp, rimraf_move_remove_rmdir));
+};
+const tmpUnlink = async (path, tmp, rm) => {
+    const tmpFile = (0,external_path_.resolve)(tmp, uniqueFilename(path));
+    await rimraf_move_remove_rename(path, tmpFile);
+    return await rm(tmpFile);
+};
+const rimrafMoveRemoveSync = (path, opt) => {
+    if (!opt.tmp) {
+        return rimrafMoveRemoveSync(path, { ...opt, tmp: defaultTmpSync(path) });
+    }
+    const tmp = opt.tmp;
+    if (path === opt.tmp && (0,external_path_.parse)(path).root !== path) {
+        throw new Error('cannot delete temp directory used for deletion');
+    }
+    const entries = readdirOrErrorSync(path);
+    if (!Array.isArray(entries)) {
+        if (entries.code === 'ENOENT') {
+            return;
+        }
+        if (entries.code !== 'ENOTDIR') {
+            throw entries;
+        }
+        return ignoreENOENTSync(() => tmpUnlinkSync(path, tmp, unlinkFixEPERMSync));
+    }
+    for (const entry of entries) {
+        rimrafMoveRemoveSync((0,external_path_.resolve)(path, entry), opt);
+    }
+    if (opt.preserveRoot === false && path === (0,external_path_.parse)(path).root) {
+        return;
+    }
+    return ignoreENOENTSync(() => tmpUnlinkSync(path, tmp, external_fs_.rmdirSync));
+};
+const tmpUnlinkSync = (path, tmp, rmSync) => {
+    const tmpFile = (0,external_path_.resolve)(tmp, uniqueFilename(path));
+    (0,external_fs_.renameSync)(path, tmpFile);
+    return rmSync(tmpFile);
+};
+//# sourceMappingURL=rimraf-move-remove.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/rimraf-windows.js
+// This is the same as rimrafPosix, with the following changes:
+//
+// 1. EBUSY, ENFILE, EMFILE trigger retries and/or exponential backoff
+// 2. All non-directories are removed first and then all directories are
+//    removed in a second sweep.
+// 3. If we hit ENOTEMPTY in the second sweep, fall back to move-remove on
+//    the that folder.
+//
+// Note: "move then remove" is 2-10 times slower, and just as unreliable.
+
+
+
+
+
+
+
+const { unlink: rimraf_windows_unlink, rmdir: rimraf_windows_rmdir } = promises;
+const rimrafWindowsFile = retryBusy(fixEPERM(rimraf_windows_unlink));
+const rimrafWindowsFileSync = retryBusySync(fixEPERMSync(external_fs_.unlinkSync));
+const rimrafWindowsDir = retryBusy(fixEPERM(rimraf_windows_rmdir));
+const rimrafWindowsDirSync = retryBusySync(fixEPERMSync(external_fs_.rmdirSync));
+const rimrafWindowsDirMoveRemoveFallback = async (path, opt) => {
+    try {
+        await rimrafWindowsDir(path, opt);
+    }
+    catch (er) {
+        if (er?.code === 'ENOTEMPTY') {
+            return await rimrafMoveRemove(path, opt);
+        }
+        throw er;
+    }
+};
+const rimrafWindowsDirMoveRemoveFallbackSync = (path, opt) => {
+    try {
+        rimrafWindowsDirSync(path, opt);
+    }
+    catch (er) {
+        if (er?.code === 'ENOTEMPTY') {
+            return rimrafMoveRemoveSync(path, opt);
+        }
+        throw er;
+    }
+};
+const START = Symbol('start');
+const CHILD = Symbol('child');
+const FINISH = Symbol('finish');
+const states = new Set([START, CHILD, FINISH]);
+const rimrafWindows = async (path, opt, state = START) => {
+    if (!states.has(state)) {
+        throw new TypeError('invalid third argument passed to rimraf');
+    }
+    const entries = await readdirOrError(path);
+    if (!Array.isArray(entries)) {
+        if (entries.code === 'ENOENT') {
+            return;
+        }
+        if (entries.code !== 'ENOTDIR') {
+            throw entries;
+        }
+        // is a file
+        return ignoreENOENT(rimrafWindowsFile(path, opt));
+    }
+    await Promise.all(entries.map(entry => rimrafWindows((0,external_path_.resolve)(path, entry), opt, state === START ? CHILD : state)));
+    if (state === START) {
+        return rimrafWindows(path, opt, FINISH);
+    }
+    else if (state === FINISH) {
+        if (opt.preserveRoot === false && path === (0,external_path_.parse)(path).root) {
+            return;
+        }
+        return ignoreENOENT(rimrafWindowsDirMoveRemoveFallback(path, opt));
+    }
+};
+const rimrafWindowsSync = (path, opt, state = START) => {
+    if (!states.has(state)) {
+        throw new TypeError('invalid third argument passed to rimraf');
+    }
+    const entries = readdirOrErrorSync(path);
+    if (!Array.isArray(entries)) {
+        if (entries.code === 'ENOENT') {
+            return;
+        }
+        if (entries.code !== 'ENOTDIR') {
+            throw entries;
+        }
+        // is a file
+        return ignoreENOENTSync(() => rimrafWindowsFileSync(path, opt));
+    }
+    for (const entry of entries) {
+        const s = state === START ? CHILD : state;
+        rimrafWindowsSync((0,external_path_.resolve)(path, entry), opt, s);
+    }
+    if (state === START) {
+        return rimrafWindowsSync(path, opt, FINISH);
+    }
+    else if (state === FINISH) {
+        if (opt.preserveRoot === false && path === (0,external_path_.parse)(path).root) {
+            return;
+        }
+        return ignoreENOENTSync(() => {
+            rimrafWindowsDirMoveRemoveFallbackSync(path, opt);
+        });
+    }
+};
+//# sourceMappingURL=rimraf-windows.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/rimraf-manual.js
+
+
+
+const rimrafManual = platform === 'win32' ? rimrafWindows : rimrafPosix;
+const rimrafManualSync = platform === 'win32' ? rimrafWindowsSync : rimrafPosixSync;
+//# sourceMappingURL=rimraf-manual.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/rimraf-native.js
+
+const { rm: rimraf_native_rm } = promises;
+const rimrafNative = (path, opt) => rimraf_native_rm(path, {
+    ...opt,
+    force: true,
+    recursive: true,
+});
+const rimrafNativeSync = (path, opt) => (0,external_fs_.rmSync)(path, {
+    ...opt,
+    force: true,
+    recursive: true,
+});
+//# sourceMappingURL=rimraf-native.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/use-native.js
+const version = process.env.__TESTING_RIMRAF_NODE_VERSION__ || process.version;
+const versArr = version.replace(/^v/, '').split('.');
+const hasNative = +versArr[0] > 14 || (+versArr[0] === 14 && +versArr[1] >= 14);
+// we do NOT use native by default on Windows, because Node's native
+// rm implementation is less advanced.  Change this code if that changes.
+
+const useNative = !hasNative || platform === 'win32' ? () => false : () => true;
+const useNativeSync = !hasNative || platform === 'win32' ? () => false : () => true;
+//# sourceMappingURL=use-native.js.map
+;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/index.js
+
+
+const typeOrUndef = (val, t) => typeof val === 'undefined' || typeof val === t;
+const isRimrafOptions = (o) => !!o &&
+    typeof o === 'object' &&
+    typeOrUndef(o.preserveRoot, 'boolean') &&
+    typeOrUndef(o.tmp, 'string') &&
+    typeOrUndef(o.maxRetries, 'number') &&
+    typeOrUndef(o.retryDelay, 'number') &&
+    typeOrUndef(o.backoff, 'number') &&
+    typeOrUndef(o.maxBackoff, 'number');
+const assertRimrafOptions = (o) => {
+    if (!isRimrafOptions(o)) {
+        throw new Error('invalid rimraf options');
+    }
+};
+
+
+
+
+
+
+const wrap = (fn) => async (path, opt) => {
+    const options = opt_arg(opt);
+    await (Array.isArray(path)
+        ? Promise.all(path.map(p => fn(path_arg(p, options), options)))
+        : fn(path_arg(path, options), options));
+};
+const wrapSync = (fn) => (path, opt) => {
+    const options = opt_arg(opt);
+    return Array.isArray(path)
+        ? path.forEach(p => fn(path_arg(p, options), options))
+        : fn(path_arg(path, options), options);
+};
+const nativeSync = wrapSync(rimrafNativeSync);
+const mjs_native = Object.assign(wrap(rimrafNative), { sync: nativeSync });
+const manualSync = wrapSync(rimrafManualSync);
+const manual = Object.assign(wrap(rimrafManual), { sync: manualSync });
+const windowsSync = wrapSync(rimrafWindowsSync);
+const windows = Object.assign(wrap(rimrafWindows), { sync: windowsSync });
+const posixSync = wrapSync(rimrafPosixSync);
+const posix = Object.assign(wrap(rimrafPosix), { sync: posixSync });
+const moveRemoveSync = wrapSync(rimrafMoveRemoveSync);
+const moveRemove = Object.assign(wrap(rimrafMoveRemove), {
+    sync: moveRemoveSync,
+});
+const rimrafSync = wrapSync((path, opt) => useNativeSync() ? rimrafNativeSync(path, opt) : rimrafManualSync(path, opt));
+const sync = (/* unused pure expression or super */ null && (rimrafSync));
+const rimraf = Object.assign(wrap((path, opt) => useNative() ? rimrafNative(path, opt) : rimrafManual(path, opt)), {
+    // this weirdness because it's easier than explicitly declaring
+    rimraf: manual,
+    sync: rimrafSync,
+    rimrafSync: rimrafSync,
+    manual,
+    manualSync,
+    native: mjs_native,
+    nativeSync,
+    posix,
+    posixSync,
+    windows,
+    windowsSync,
+    moveRemove,
+    moveRemoveSync,
+});
+rimraf.rimraf = rimraf;
+/* harmony default export */ const mjs = ((/* unused pure expression or super */ null && (rimraf)));
+//# sourceMappingURL=index.js.map
+;// CONCATENATED MODULE: ./src/index.js
 /* eslint-disable no-console */
 const core = __nccwpck_require__(7820);
 const github = __nccwpck_require__(3737);
 
-const { exec } = __nccwpck_require__(2081);
-const fs = __nccwpck_require__(7147);
-const path = __nccwpck_require__(1017);
 
-const glob = __nccwpck_require__(5001);
-const {
-  diffImageToSnapshot,
-} = __nccwpck_require__(3316);
-const { rimraf } = __nccwpck_require__(5245);
 
+
+
+
+
+
+
+const diffDir = './snapshot-diff';
 const tokenFromInput = core.getInput('token');
 const snapshotsDirectoryFromInput = core.getInput('snapshots-dir');
-const diffDir = './snapshot-diff';
 const baseBranchNameFromInput = core.getInput('base-branch-name');
 const branchNameFromInput = core.getInput('branch-name');
 const prNumberFromInput = core.getInput('pr-number');
@@ -23133,7 +22994,7 @@ const octokit = github.getOctokit(tokenFromInput)
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
+    ;(0,external_child_process_.exec)(command, (error, stdout, stderr) => {
       if (error) {
         reject(error);
         return;
@@ -23156,7 +23017,7 @@ const deleteDir = (dir) => rimraf(dir);
 
 const globAsync = (pattern) =>
   new Promise((resolve, reject) => {
-    glob(pattern, (er, files) => {
+    glob_default()(pattern, (er, files) => {
       if (er) {
         reject(er);
       }
@@ -23167,7 +23028,7 @@ const globAsync = (pattern) =>
 
 const fileExists = async (filePath) => {
   try {
-    await fs.promises.access(filePath, fs.constants.F_OK);
+    await external_fs_default().promises.access(filePath, (external_fs_default()).constants.F_OK);
     return true;
   } catch {
     return false;
@@ -23175,14 +23036,14 @@ const fileExists = async (filePath) => {
 };
 
 const isDirectoryEmpty = async (dirName) =>
-  !(await fs.promises.readdir(dirName)).length;
+  !(await external_fs_default().promises.readdir(dirName)).length;
 
 const removeEmptyDirs = async (globPattern) => {
   const dirs = await globAsync(globPattern);
   for (let i = 0; i < dirs.length; i++) {
     const dir = dirs[i];
     if (await isDirectoryEmpty(dir)) {
-      fs.promises.rmdir(dir);
+      external_fs_default().promises.rmdir(dir);
     }
   }
 };
@@ -23205,30 +23066,30 @@ const run = async () => {
     for (let i = 0; i < filePaths.length; i++) {
       const filePath = filePaths[i];
       const destPath = `${diffDir}/${filePath.split(snapshotsDirectoryFromInput)[1]}`;
-      const destPathParsed = path.parse(destPath);
+      const destPathParsed = external_path_default().parse(destPath);
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
       const snapshotIdentifier = destName.split('-snap')[0];
 
-      await fs.promises.mkdir(path.join(destDir, 'diff'), { recursive: true });
+      await external_fs_default().promises.mkdir(external_path_default().join(destDir, 'diff'), { recursive: true });
       try {
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
         const diffOpts = {
-          receivedImageBuffer: fs.readFileSync(filePath),
+          receivedImageBuffer: external_fs_default().readFileSync(filePath),
           snapshotIdentifier,
-          snapshotsDir: path.join(__dirname, '..', destDir),
-          diffDir: path.join(__dirname, '..', destDir, 'diff'),
+          snapshotsDir: external_path_default().join(__dirname, '..', destDir),
+          diffDir: external_path_default().join(__dirname, '..', destDir, 'diff'),
           failureThresholdType: 'pixel',
           failureThreshold: 0,
           receivedDir: diffDir,
         };
 
-        diffImageToSnapshot(diffOpts);
+        (0,diff_snapshot.diffImageToSnapshot)(diffOpts);
       } catch {
         // nothing on dev - new snapshot, just copy
-        const origFilePath = path.join(__dirname, '..', filePath);
-        const newFilePath = path.join(
+        const origFilePath = external_path_default().join(__dirname, '..', filePath);
+        const newFilePath = external_path_default().join(
           __dirname,
           '..',
           destDir,
@@ -23237,7 +23098,7 @@ const run = async () => {
         );
 
         if (await fileExists(origFilePath)) {
-          await fs.promises.copyFile(origFilePath, newFilePath);
+          await external_fs_default().promises.copyFile(origFilePath, newFilePath);
         }
       }
     }
@@ -23245,13 +23106,13 @@ const run = async () => {
     // remove original dev files
     const originals = await globAsync(`${diffDir}/*/*.png`);
     originals.forEach((file) => {
-      fs.unlinkSync(file);
+      external_fs_default().unlinkSync(file);
     });
 
     // move diffs to parent dir
     const diffs = await globAsync(`${diffDir}/*/diff/*.png`);
     diffs.forEach((file) => {
-      fs.renameSync(file, file.split('/diff/').join('/'));
+      external_fs_default().renameSync(file, file.split('/diff/').join('/'));
     });
 
     // remove diff dir
@@ -23273,7 +23134,7 @@ const run = async () => {
       const isNew = !!(await globAsync(`${dir}/*-new.png`)).length;
       (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
 
-      fs.writeFileSync(
+      external_fs_default().writeFileSync(
         `${dir}/README.md`,
         [
           `# ${storyId}`,
@@ -23295,7 +23156,7 @@ const run = async () => {
       readMe.push('## Updated snapshots', ...updatedSnaps, '');
     }
 
-    fs.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
+    external_fs_default().writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
     core.setOutput(filePaths);
   } catch (e) {
     // exit code 1 for grep means "no match"
