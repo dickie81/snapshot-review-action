@@ -2,19 +2,19 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import  { exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
-const glob = require('glob');
-const {
+import glob from 'glob';
+import {
   diffImageToSnapshot,
-} = require('jest-image-snapshot/src/diff-snapshot');
-const { rimraf } = require('rimraf');
+} from 'jest-image-snapshot/src/diff-snapshot';
+import { rimraf } from 'rimraf';
 
+const diffDir = './snapshot-diff';
 const tokenFromInput = core.getInput('token');
 const snapshotsDirectoryFromInput = core.getInput('snapshots-dir');
-const diffDir = './snapshot-diff';
 const baseBranchNameFromInput = core.getInput('base-branch-name');
 const branchNameFromInput = core.getInput('branch-name');
 const prNumberFromInput = core.getInput('pr-number');
