@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-const core = require('@actions/core');
-const github = require('@actions/github');
+import core from '@actions/core';
+import github from '@actions/github';
 
 import  { exec } from 'child_process';
 import fs from 'fs';
@@ -85,7 +85,7 @@ const run = async () => {
       `GH_TOKEN=${tokenFromInput} gh pr diff ${prNumberFromInput} --name-only`,
     );
 
-    console.log("filePaths", filePaths);
+    console.log("Found the following modified files:", filePaths);
 
     const originUrl = await execCommand('git config --get remote.origin.url');
     const origin = originUrl[0].split('.git')[0];
@@ -100,8 +100,11 @@ const run = async () => {
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
       const snapshotIdentifier = destName.split('-snap')[0];
+      const diffDir = path.join(destDir, 'diff');
 
-      await fs.promises.mkdir(path.join(destDir, 'diff'), { recursive: true });
+      console.log("Creating diff directory:", diffDir);
+
+      await fs.promises.mkdir(diffDir, { recursive: true });
       try {
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 

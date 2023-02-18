@@ -22281,6 +22281,12 @@ var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
 
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7820);
+var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3737);
+var github_default = /*#__PURE__*/__nccwpck_require__.n(github);
 // EXTERNAL MODULE: external "child_process"
 var external_child_process_ = __nccwpck_require__(2081);
 // EXTERNAL MODULE: external "fs"
@@ -22971,8 +22977,8 @@ rimraf.rimraf = rimraf;
 //# sourceMappingURL=index.js.map
 ;// CONCATENATED MODULE: ./src/index.js
 /* eslint-disable no-console */
-const core = __nccwpck_require__(7820);
-const github = __nccwpck_require__(3737);
+
+
 
 
 
@@ -22983,14 +22989,14 @@ const github = __nccwpck_require__(3737);
 
 
 const diffDir = './snapshot-diff';
-const tokenFromInput = core.getInput('token');
-const snapshotsDirectoryFromInput = core.getInput('snapshots-dir');
-const baseBranchNameFromInput = core.getInput('base-branch-name');
-const branchNameFromInput = core.getInput('branch-name');
-const prNumberFromInput = core.getInput('pr-number');
-const reviewRepoRemotePathFromInputFromInput = core.getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
+const tokenFromInput = core_default().getInput('token');
+const snapshotsDirectoryFromInput = core_default().getInput('snapshots-dir');
+const baseBranchNameFromInput = core_default().getInput('base-branch-name');
+const branchNameFromInput = core_default().getInput('branch-name');
+const prNumberFromInput = core_default().getInput('pr-number');
+const reviewRepoRemotePathFromInputFromInput = core_default().getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
-const octokit = github.getOctokit(tokenFromInput)
+const octokit = github_default().getOctokit(tokenFromInput)
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
@@ -23055,7 +23061,7 @@ const run = async () => {
       `GH_TOKEN=${tokenFromInput} gh pr diff ${prNumberFromInput} --name-only`,
     );
 
-    console.log("filePaths", filePaths);
+    console.log("Found the following modified files:", filePaths);
 
     const originUrl = await execCommand('git config --get remote.origin.url');
     const origin = originUrl[0].split('.git')[0];
@@ -23070,8 +23076,11 @@ const run = async () => {
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
       const snapshotIdentifier = destName.split('-snap')[0];
+      const diffDir = external_path_default().join(destDir, 'diff');
 
-      await external_fs_default().promises.mkdir(external_path_default().join(destDir, 'diff'), { recursive: true });
+      console.log("Creating diff directory:", diffDir);
+
+      await external_fs_default().promises.mkdir(diffDir, { recursive: true });
       try {
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
@@ -23157,16 +23166,16 @@ const run = async () => {
     }
 
     external_fs_default().writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-    core.setOutput(filePaths);
+    core_default().setOutput(filePaths);
   } catch (e) {
     // exit code 1 for grep means "no match"
     console.log("err", e)
 
     if (e.code === 1) {
       console.log('no diff');
-      core.setOutput([]);
+      core_default().setOutput([]);
     } else {
-      core.setFailed(e.message);
+      core_default().setFailed(e.message);
     }
   } 
 }
