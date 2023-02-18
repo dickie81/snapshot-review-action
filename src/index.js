@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { getInput } from '@actions/core';
+import { getInput, setOutput, setFailed } from '@actions/core';
 import { getOctokit } from '@actions/github';
 
 import  { exec } from 'child_process';
@@ -190,16 +190,16 @@ const run = async () => {
     }
 
     fs.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-    core.setOutput(filePaths);
+    setOutput(filePaths);
   } catch (e) {
     // exit code 1 for grep means "no match"
     console.log("err", e)
 
     if (e.code === 1) {
       console.log('no diff');
-      core.setOutput([]);
+      setOutput([]);
     } else {
-      core.setFailed(e.message);
+      setFailed(e.message);
     }
   } 
 }

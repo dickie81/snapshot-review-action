@@ -22282,7 +22282,7 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var lib_core = __nccwpck_require__(7820);
+var core = __nccwpck_require__(7820);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(3737);
 // EXTERNAL MODULE: external "child_process"
@@ -22987,12 +22987,12 @@ rimraf.rimraf = rimraf;
 
 
 const diffDir = './snapshot-diff';
-const tokenFromInput = (0,lib_core.getInput)('token');
-const snapshotsDirectoryFromInput = (0,lib_core.getInput)('snapshots-dir');
-const baseBranchNameFromInput = (0,lib_core.getInput)('base-branch-name');
-const branchNameFromInput = (0,lib_core.getInput)('branch-name');
-const prNumberFromInput = (0,lib_core.getInput)('pr-number');
-const reviewRepoRemotePathFromInputFromInput = (0,lib_core.getInput)('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
+const tokenFromInput = (0,core.getInput)('token');
+const snapshotsDirectoryFromInput = (0,core.getInput)('snapshots-dir');
+const baseBranchNameFromInput = (0,core.getInput)('base-branch-name');
+const branchNameFromInput = (0,core.getInput)('branch-name');
+const prNumberFromInput = (0,core.getInput)('pr-number');
+const reviewRepoRemotePathFromInputFromInput = (0,core.getInput)('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
 const octokit = (0,github.getOctokit)(tokenFromInput)
 
@@ -23164,16 +23164,16 @@ const run = async () => {
     }
 
     external_fs_default().writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-    core.setOutput(filePaths);
+    (0,core.setOutput)(filePaths);
   } catch (e) {
     // exit code 1 for grep means "no match"
     console.log("err", e)
 
     if (e.code === 1) {
       console.log('no diff');
-      core.setOutput([]);
+      (0,core.setOutput)([]);
     } else {
-      core.setFailed(e.message);
+      (0,core.setFailed)(e.message);
     }
   } 
 }
