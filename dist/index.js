@@ -22281,10 +22281,6 @@ var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(7820);
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(3737);
 // EXTERNAL MODULE: external "child_process"
 var external_child_process_ = __nccwpck_require__(2081);
 // EXTERNAL MODULE: external "fs"
@@ -22293,6 +22289,13 @@ var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(1017);
 var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
+// EXTERNAL MODULE: external "os"
+var external_os_ = __nccwpck_require__(2037);
+var external_os_default = /*#__PURE__*/__nccwpck_require__.n(external_os_);
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7820);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3737);
 // EXTERNAL MODULE: ./node_modules/glob/glob.js
 var glob = __nccwpck_require__(5001);
 var glob_default = /*#__PURE__*/__nccwpck_require__.n(glob);
@@ -22590,8 +22593,6 @@ const retryBusySync = (fn) => {
     return method;
 };
 //# sourceMappingURL=retry-busy.js.map
-// EXTERNAL MODULE: external "os"
-var external_os_ = __nccwpck_require__(2037);
 ;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/default-tmp.js
 // The default temporary folder location for use in the windows algorithm.
 // It's TEMPting to use dirname(path), since that's guaranteed to be on the
@@ -22986,6 +22987,9 @@ rimraf.rimraf = rimraf;
 
 
 
+
+ 
+
 const diffDir = './snapshot-diff';
 const tokenFromInput = (0,core.getInput)('token');
 const snapshotsDirectoryFromInput = (0,core.getInput)('snapshots-dir');
@@ -22996,9 +23000,14 @@ const reviewRepoRemotePathFromInputFromInput = (0,core.getInput)('review-repo-re
 
 const octokit = (0,github.getOctokit)(tokenFromInput)
 
+// get temp directory
+const tempDir = external_os_default().tmpdir();
+
+console.log("Temp directory found:", tempDir);
+
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
-    ;(0,external_child_process_.exec)(command, (error, stdout, stderr) => {
+    (0,external_child_process_.exec)(command, (error, stdout, stderr) => {
       if (error) {
         reject(error);
         return;
