@@ -23117,7 +23117,9 @@ const run = async () => {
 
         //await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
+        const { stdout } = await execPromise(`ls ${diffDir}`);
 
+        console.log(`ls ${diffDir} --->`, stdout);
 
         const diffOpts = {
           receivedImageBuffer: external_node_fs_default().readFileSync(filePath),
