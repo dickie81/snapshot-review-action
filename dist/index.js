@@ -23148,7 +23148,7 @@ const run = async () => {
     await removeEmptyDirs(`${diffDir}/*`);
 
     const readMe = [
-      `# Image snapshot diff files for [${branchName}](${origin}/${prLink})`,
+      `# Image snapshot diff files for [${branchNameFromInput}](${origin}/${prLink})`,
       '',
     ];
     const newSnaps = [];
