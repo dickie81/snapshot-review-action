@@ -23074,7 +23074,7 @@ const run = async () => {
 
     for (let i = 0; i < filePaths.length; i++) {
       const filePath = filePaths[i];
-      const destPath = `${diffDir}/${filePath.split(snapshotsDirectoryFromInput)[1]}`;
+      const destPath = external_path_default().join(diffDir, filePath.split(snapshotsDirectoryFromInput)[1]);
       const destPathParsed = external_path_default().parse(destPath);
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
