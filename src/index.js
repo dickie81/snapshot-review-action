@@ -3,6 +3,7 @@ import  { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import os from "os";
+import { promisify } from 'node:util';
 
 import { getInput, setOutput, setFailed } from '@actions/core';
 import { getOctokit } from '@actions/github';
@@ -10,6 +11,8 @@ import { getOctokit } from '@actions/github';
 import glob from 'glob';
 import { diffImageToSnapshot } from 'jest-image-snapshot/src/diff-snapshot';
 import { rimraf } from 'rimraf'; 
+
+const execPromise = promisify(exec);
 
 const tempDir = os.tmpdir();
 const diffDir = path.join(tempDir, 'snapshot-diff');
@@ -107,6 +110,11 @@ const run = async () => {
       console.log("Creating diff directory:", diffDirPath);
 
       await fs.promises.mkdir(diffDirPath, { recursive: true });
+
+      const { stdout } = await execPromise(`ls ${tempDir}`);
+
+      console.log("ls tempDir", stdout);
+
       try {
         console.log(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
