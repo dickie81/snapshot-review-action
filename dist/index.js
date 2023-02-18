@@ -23074,11 +23074,11 @@ const run = async () => {
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
       const snapshotIdentifier = destName.split('-snap')[0];
-      const diffDir = external_path_default().join(destDir, 'diff');
+      const diffDirPath = external_path_default().join(destDir, 'diff');
 
       console.log("Creating diff directory:", diffDir);
 
-      await external_fs_default().promises.mkdir(diffDir, { recursive: true });
+      await external_fs_default().promises.mkdir(diffDirPath, { recursive: true });
       try {
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
