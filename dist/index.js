@@ -23085,6 +23085,8 @@ const run = async () => {
 
       await external_fs_default().promises.mkdir(diffDirPath, { recursive: true });
       try {
+        console.log(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
+
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
         const diffOpts = {
@@ -23102,8 +23104,6 @@ const run = async () => {
         // nothing on dev - new snapshot, just copy
         const origFilePath = external_path_default().join(__dirname, '..', filePath);
         const newFilePath = external_path_default().join(
-          __dirname,
-          '..',
           destDir,
           'diff',
           `${snapshotIdentifier}-new.png`,
