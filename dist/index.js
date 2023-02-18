@@ -22282,11 +22282,9 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(7820);
-var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
+var lib_core = __nccwpck_require__(7820);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(3737);
-var github_default = /*#__PURE__*/__nccwpck_require__.n(github);
 // EXTERNAL MODULE: external "child_process"
 var external_child_process_ = __nccwpck_require__(2081);
 // EXTERNAL MODULE: external "fs"
@@ -22989,14 +22987,14 @@ rimraf.rimraf = rimraf;
 
 
 const diffDir = './snapshot-diff';
-const tokenFromInput = core_default().getInput('token');
-const snapshotsDirectoryFromInput = core_default().getInput('snapshots-dir');
-const baseBranchNameFromInput = core_default().getInput('base-branch-name');
-const branchNameFromInput = core_default().getInput('branch-name');
-const prNumberFromInput = core_default().getInput('pr-number');
-const reviewRepoRemotePathFromInputFromInput = core_default().getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
+const tokenFromInput = (0,lib_core.getInput)('token');
+const snapshotsDirectoryFromInput = (0,lib_core.getInput)('snapshots-dir');
+const baseBranchNameFromInput = (0,lib_core.getInput)('base-branch-name');
+const branchNameFromInput = (0,lib_core.getInput)('branch-name');
+const prNumberFromInput = (0,lib_core.getInput)('pr-number');
+const reviewRepoRemotePathFromInputFromInput = (0,lib_core.getInput)('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
-const octokit = github_default().getOctokit(tokenFromInput)
+const octokit = (0,github.getOctokit)(tokenFromInput)
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
@@ -23166,16 +23164,16 @@ const run = async () => {
     }
 
     external_fs_default().writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-    core_default().setOutput(filePaths);
+    core.setOutput(filePaths);
   } catch (e) {
     // exit code 1 for grep means "no match"
     console.log("err", e)
 
     if (e.code === 1) {
       console.log('no diff');
-      core_default().setOutput([]);
+      core.setOutput([]);
     } else {
-      core_default().setFailed(e.message);
+      core.setFailed(e.message);
     }
   } 
 }

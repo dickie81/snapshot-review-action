@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import core from '@actions/core';
-import github from '@actions/github';
+import { getInput } from '@actions/core';
+import { getOctokit } from '@actions/github';
 
 import  { exec } from 'child_process';
 import fs from 'fs';
@@ -13,14 +13,14 @@ import {
 import { rimraf } from 'rimraf';
 
 const diffDir = './snapshot-diff';
-const tokenFromInput = core.getInput('token');
-const snapshotsDirectoryFromInput = core.getInput('snapshots-dir');
-const baseBranchNameFromInput = core.getInput('base-branch-name');
-const branchNameFromInput = core.getInput('branch-name');
-const prNumberFromInput = core.getInput('pr-number');
-const reviewRepoRemotePathFromInputFromInput = core.getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
+const tokenFromInput = getInput('token');
+const snapshotsDirectoryFromInput = getInput('snapshots-dir');
+const baseBranchNameFromInput = getInput('base-branch-name');
+const branchNameFromInput = getInput('branch-name');
+const prNumberFromInput = getInput('pr-number');
+const reviewRepoRemotePathFromInputFromInput = getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
-const octokit = github.getOctokit(tokenFromInput)
+const octokit = getOctokit(tokenFromInput)
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
