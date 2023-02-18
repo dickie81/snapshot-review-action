@@ -23099,6 +23099,10 @@ const run = async () => {
 
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
+        const { data } = await octokit.repos.getContent({ "owner": 'dickie81', "repo": 'snapshot-review-action', "path": filePath, "ref": baseBranchNameFromInput })
+
+        console.log(data);
+
         const diffOpts = {
           receivedImageBuffer: external_fs_default().readFileSync(filePath),
           snapshotIdentifier,
