@@ -136,11 +136,16 @@ const run = async () => {
 
         console.log(`ls ${diffDir} --->`, stdout);
 
+
+        const { stdout: st } = await execPromise(`ls ${__dirname}`);
+
+        console.log(`ls ${__dirname} --->`, st);
+
         const diffOpts = {
           receivedImageBuffer: fs.readFileSync(filePath),
           snapshotIdentifier,
-          snapshotsDir: path.join(__dirname, '..', destDir),
-          diffDir: path.join(__dirname, '..', destDir, 'diff'),
+          snapshotsDir: path.join(__dirname, '..', filePath),
+          diffDir: destDir,
           failureThresholdType: 'pixel',
           failureThreshold: 0,
           receivedDir: diffDir,
