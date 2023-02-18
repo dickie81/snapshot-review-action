@@ -22292,6 +22292,8 @@ var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: external "os"
 var external_os_ = __nccwpck_require__(2037);
 var external_os_default = /*#__PURE__*/__nccwpck_require__.n(external_os_);
+;// CONCATENATED MODULE: external "node:util"
+const external_node_util_namespaceObject = require("node:util");
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(7820);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
@@ -22986,7 +22988,10 @@ rimraf.rimraf = rimraf;
 
 
 
+
  
+
+const execPromise = (0,external_node_util_namespaceObject.promisify)(external_child_process_.exec);
 
 const tempDir = external_os_default().tmpdir();
 const diffDir = external_path_default().join(tempDir, 'snapshot-diff');
@@ -23084,6 +23089,11 @@ const run = async () => {
       console.log("Creating diff directory:", diffDirPath);
 
       await external_fs_default().promises.mkdir(diffDirPath, { recursive: true });
+
+      const { stdout } = await execPromise(`ls ${tempDir}`);
+
+      console.log("ls tempDir", stdout);
+
       try {
         console.log(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
