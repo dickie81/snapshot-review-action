@@ -100,11 +100,11 @@ const run = async () => {
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
       const snapshotIdentifier = destName.split('-snap')[0];
-      const diffDir = path.join(destDir, 'diff');
+      const diffDirPath = path.join(destDir, 'diff');
 
       console.log("Creating diff directory:", diffDir);
 
-      await fs.promises.mkdir(diffDir, { recursive: true });
+      await fs.promises.mkdir(diffDirPath, { recursive: true });
       try {
         await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
