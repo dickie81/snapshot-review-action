@@ -137,7 +137,9 @@ const run = async () => {
         };
 
         diffImageToSnapshot(diffOpts);
-      } catch {
+      } catch (x) {
+        console.log(x);
+
         // nothing on dev - new snapshot, just copy
         const origFilePath = path.join(__dirname, '..', filePath);
         const newFilePath = path.join(
