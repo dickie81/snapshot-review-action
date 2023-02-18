@@ -118,7 +118,7 @@ const run = async () => {
       try {
         console.log(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
-        const { data } = await octokit.repos.getContent({ "owner": 'dickie81', "repo": 'snapshot-review-action', "path": filePath, "ref": baseBranchNameFromInput })
+        const { data } = await octokit.rest.repos.getContent({ "owner": 'dickie81', "repo": 'snapshot-review-action', "path": filePath, "ref": baseBranchNameFromInput })
 
         console.log(data);
 
@@ -142,6 +142,9 @@ const run = async () => {
 
         // nothing on dev - new snapshot, just copy
         const origFilePath = path.join(__dirname, '..', filePath);
+
+        console.log("origFilePath", origFilePath);
+
         const newFilePath = path.join(
           destDir,
           'diff',
