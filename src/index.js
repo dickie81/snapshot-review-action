@@ -118,11 +118,13 @@ const run = async () => {
       try {
         console.log(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
-        await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
-
         const { data } = await octokit.repos.getContent({ "owner": 'dickie81', "repo": 'snapshot-review-action', "path": filePath, "ref": baseBranchNameFromInput })
 
         console.log(data);
+
+        await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
+
+
 
         const diffOpts = {
           receivedImageBuffer: fs.readFileSync(filePath),
