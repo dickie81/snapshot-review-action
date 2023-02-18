@@ -22281,17 +22281,17 @@ var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: external "child_process"
-var external_child_process_ = __nccwpck_require__(2081);
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
-var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
-var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
-// EXTERNAL MODULE: external "os"
-var external_os_ = __nccwpck_require__(2037);
-var external_os_default = /*#__PURE__*/__nccwpck_require__.n(external_os_);
+;// CONCATENATED MODULE: external "node:child_process"
+const external_node_child_process_namespaceObject = require("node:child_process");
+;// CONCATENATED MODULE: external "node:fs"
+const external_node_fs_namespaceObject = require("node:fs");
+var external_node_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_node_fs_namespaceObject);
+;// CONCATENATED MODULE: external "node:path"
+const external_node_path_namespaceObject = require("node:path");
+var external_node_path_default = /*#__PURE__*/__nccwpck_require__.n(external_node_path_namespaceObject);
+;// CONCATENATED MODULE: external "node:os"
+const external_node_os_namespaceObject = require("node:os");
+var external_node_os_default = /*#__PURE__*/__nccwpck_require__.n(external_node_os_namespaceObject);
 ;// CONCATENATED MODULE: external "node:util"
 const external_node_util_namespaceObject = require("node:util");
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
@@ -22313,6 +22313,8 @@ var diff_snapshot = __nccwpck_require__(3316);
 ;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/platform.js
 /* harmony default export */ const platform = (process.env.__TESTING_RIMRAF_PLATFORM__ || process.platform);
 //# sourceMappingURL=platform.js.map
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
 // EXTERNAL MODULE: external "util"
 var external_util_ = __nccwpck_require__(3837);
 ;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/path-arg.js
@@ -22365,6 +22367,8 @@ const pathArg = (path, opt = {}) => {
 };
 /* harmony default export */ const path_arg = (pathArg);
 //# sourceMappingURL=path-arg.js.map
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
 ;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/fs.js
 // promisify ourselves, because older nodes don't have fs.promises
 
@@ -22595,6 +22599,8 @@ const retryBusySync = (fn) => {
     return method;
 };
 //# sourceMappingURL=retry-busy.js.map
+// EXTERNAL MODULE: external "os"
+var external_os_ = __nccwpck_require__(2037);
 ;// CONCATENATED MODULE: ./node_modules/rimraf/dist/mjs/default-tmp.js
 // The default temporary folder location for use in the windows algorithm.
 // It's TEMPting to use dirname(path), since that's guaranteed to be on the
@@ -22991,10 +22997,12 @@ rimraf.rimraf = rimraf;
 
  
 
-const execPromise = (0,external_node_util_namespaceObject.promisify)(external_child_process_.exec);
+const execPromise = (0,external_node_util_namespaceObject.promisify)(external_node_child_process_namespaceObject.exec);
+const fsOpen = (0,external_node_util_namespaceObject.promisify)((external_node_fs_default()).open);
+const fsWrite = (0,external_node_util_namespaceObject.promisify)((external_node_fs_default()).write);
 
-const tempDir = external_os_default().tmpdir();
-const diffDir = external_path_default().join(tempDir, 'snapshot-diff');
+const tempDir = external_node_os_default().tmpdir();
+const diffDir = external_node_path_default().join(tempDir, 'snapshot-diff');
 const tokenFromInput = (0,core.getInput)('token');
 const snapshotsDirectoryFromInput = (0,core.getInput)('snapshots-dir');
 const baseBranchNameFromInput = (0,core.getInput)('base-branch-name');
@@ -23008,7 +23016,7 @@ console.log("Temp directory found:", tempDir);
 
 const execCommand = (command) =>
   new Promise((resolve, reject) => {
-    (0,external_child_process_.exec)(command, (error, stdout, stderr) => {
+    (0,external_node_child_process_namespaceObject.exec)(command, (error, stdout, stderr) => {
       if (error) {
         reject(error);
         return;
@@ -23042,7 +23050,7 @@ const globAsync = (pattern) =>
 
 const fileExists = async (filePath) => {
   try {
-    await external_fs_default().promises.access(filePath, (external_fs_default()).constants.F_OK);
+    await external_node_fs_default().promises.access(filePath, (external_node_fs_default()).constants.F_OK);
     return true;
   } catch {
     return false;
@@ -23050,14 +23058,14 @@ const fileExists = async (filePath) => {
 };
 
 const isDirectoryEmpty = async (dirName) =>
-  !(await external_fs_default().promises.readdir(dirName)).length;
+  !(await external_node_fs_default().promises.readdir(dirName)).length;
 
 const removeEmptyDirs = async (globPattern) => {
   const dirs = await globAsync(globPattern);
   for (let i = 0; i < dirs.length; i++) {
     const dir = dirs[i];
     if (await isDirectoryEmpty(dir)) {
-      external_fs_default().promises.rmdir(dir);
+      external_node_fs_default().promises.rmdir(dir);
     }
   }
 };
@@ -23079,16 +23087,16 @@ const run = async () => {
 
     for (let i = 0; i < filePaths.length; i++) {
       const filePath = filePaths[i];
-      const destPath = external_path_default().join(diffDir, filePath.split(snapshotsDirectoryFromInput)[1]);
-      const destPathParsed = external_path_default().parse(destPath);
+      const destPath = external_node_path_default().join(diffDir, filePath.split(snapshotsDirectoryFromInput)[1]);
+      const destPathParsed = external_node_path_default().parse(destPath);
       const destDir = destPathParsed.dir;
       const destName = destPathParsed.name;
       const snapshotIdentifier = destName.split('-snap')[0];
-      const diffDirPath = external_path_default().join(destDir, 'diff');
+      const diffDirPath = external_node_path_default().join(destDir, 'diff');
 
       console.log("Creating diff directory:", diffDirPath);
 
-      await external_fs_default().promises.mkdir(diffDirPath, { recursive: true });
+      await external_node_fs_default().promises.mkdir(diffDirPath, { recursive: true });
 
       const { stdout } = await execPromise(`ls ${tempDir}`);
 
@@ -23099,17 +23107,23 @@ const run = async () => {
 
         const { data } = await octokit.rest.repos.getContent({ "owner": 'dickie81', "repo": 'snapshot-review-action', "path": filePath, "ref": baseBranchNameFromInput })
 
+        const buf = Buffer.from(data.content, data.encoding);
+
+        const fileHandle = await fsOpen(destPath, "a");
+
+        fsWrite(fileHandle, buf);
+
         console.log(data);
 
-        await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
+        //await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
 
 
         const diffOpts = {
-          receivedImageBuffer: external_fs_default().readFileSync(filePath),
+          receivedImageBuffer: external_node_fs_default().readFileSync(filePath),
           snapshotIdentifier,
-          snapshotsDir: external_path_default().join(__dirname, '..', destDir),
-          diffDir: external_path_default().join(__dirname, '..', destDir, 'diff'),
+          snapshotsDir: external_node_path_default().join(__dirname, '..', destDir),
+          diffDir: external_node_path_default().join(__dirname, '..', destDir, 'diff'),
           failureThresholdType: 'pixel',
           failureThreshold: 0,
           receivedDir: diffDir,
@@ -23120,18 +23134,18 @@ const run = async () => {
         console.log(x);
 
         // nothing on dev - new snapshot, just copy
-        const origFilePath = external_path_default().join(__dirname, '..', filePath);
+        const origFilePath = external_node_path_default().join(__dirname, '..', filePath);
 
         console.log("origFilePath", origFilePath);
 
-        const newFilePath = external_path_default().join(
+        const newFilePath = external_node_path_default().join(
           destDir,
           'diff',
           `${snapshotIdentifier}-new.png`,
         );
 
         if (await fileExists(origFilePath)) {
-          await external_fs_default().promises.copyFile(origFilePath, newFilePath);
+          await external_node_fs_default().promises.copyFile(origFilePath, newFilePath);
         }
       }
     }
@@ -23139,13 +23153,13 @@ const run = async () => {
     // remove original dev files
     const originals = await globAsync(`${diffDir}/*/*.png`);
     originals.forEach((file) => {
-      external_fs_default().unlinkSync(file);
+      external_node_fs_default().unlinkSync(file);
     });
 
     // move diffs to parent dir
     const diffs = await globAsync(`${diffDir}/*/diff/*.png`);
     diffs.forEach((file) => {
-      external_fs_default().renameSync(file, file.split('/diff/').join('/'));
+      external_node_fs_default().renameSync(file, file.split('/diff/').join('/'));
     });
 
     // remove diff dir
@@ -23169,7 +23183,7 @@ const run = async () => {
       const isNew = !!(await globAsync(`${dir}/*-new.png`)).length;
       (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
 
-      external_fs_default().writeFileSync(
+      external_node_fs_default().writeFileSync(
         `${dir}/README.md`,
         [
           `# ${storyId}`,
@@ -23191,7 +23205,7 @@ const run = async () => {
       readMe.push('## Updated snapshots', ...updatedSnaps, '');
     }
 
-    external_fs_default().writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
+    external_node_fs_default().writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
     (0,core.setOutput)(filePaths);
   } catch (e) {
     // exit code 1 for grep means "no match"
