@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import  { exec } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import os from "os";
+import  { exec } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from "node:os";
 import { promisify } from 'node:util';
 
 import { getInput, setOutput, setFailed } from '@actions/core';
@@ -13,6 +13,8 @@ import { diffImageToSnapshot } from 'jest-image-snapshot/src/diff-snapshot';
 import { rimraf } from 'rimraf'; 
 
 const execPromise = promisify(exec);
+const fsOpen = promisify(fs.open);
+const fsWrite = promisify(fs.write);
 
 const tempDir = os.tmpdir();
 const diffDir = path.join(tempDir, 'snapshot-diff');
@@ -120,9 +122,15 @@ const run = async () => {
 
         const { data } = await octokit.rest.repos.getContent({ "owner": 'dickie81', "repo": 'snapshot-review-action', "path": filePath, "ref": baseBranchNameFromInput })
 
+        const buf = Buffer.from(data.content, data.encoding);
+
+        const fileHandle = await fsOpen(destPath, "a");
+
+        fsWrite(fileHandle, buf);
+
         console.log(data);
 
-        await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
+        //await execCommand(`git show origin/${baseBranchNameFromInput}:./${filePath} > ${destPath}`);
 
 
 
