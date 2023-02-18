@@ -23076,7 +23076,7 @@ const run = async () => {
       const snapshotIdentifier = destName.split('-snap')[0];
       const diffDirPath = external_path_default().join(destDir, 'diff');
 
-      console.log("Creating diff directory:", diffDir);
+      console.log("Creating diff directory:", diffDirPath);
 
       await external_fs_default().promises.mkdir(diffDirPath, { recursive: true });
       try {

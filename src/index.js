@@ -102,7 +102,7 @@ const run = async () => {
       const snapshotIdentifier = destName.split('-snap')[0];
       const diffDirPath = path.join(destDir, 'diff');
 
-      console.log("Creating diff directory:", diffDir);
+      console.log("Creating diff directory:", diffDirPath);
 
       await fs.promises.mkdir(diffDirPath, { recursive: true });
       try {
