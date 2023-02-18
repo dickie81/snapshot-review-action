@@ -23131,6 +23131,8 @@ const run = async () => {
           receivedDir: diffDir,
         };
 
+        console.log(diffOpts);
+
         (0,diff_snapshot.diffImageToSnapshot)(diffOpts);
       } catch (x) {
         console.log(x);
