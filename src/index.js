@@ -7,13 +7,12 @@ import os from "os";
 import { getInput, setOutput, setFailed } from '@actions/core';
 import { getOctokit } from '@actions/github';
 
-
-
 import glob from 'glob';
 import { diffImageToSnapshot } from 'jest-image-snapshot/src/diff-snapshot';
 import { rimraf } from 'rimraf'; 
 
-const diffDir = './snapshot-diff';
+const tempDir = os.tmpdir();
+const diffDir = path.join(tempDir, 'snapshot-diff');
 const tokenFromInput = getInput('token');
 const snapshotsDirectoryFromInput = getInput('snapshots-dir');
 const baseBranchNameFromInput = getInput('base-branch-name');
@@ -22,9 +21,6 @@ const prNumberFromInput = getInput('pr-number');
 const reviewRepoRemotePathFromInputFromInput = getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
 const octokit = getOctokit(tokenFromInput)
-
-// get temp directory
-const tempDir = os.tmpdir();
 
 console.log("Temp directory found:", tempDir);
 

@@ -22986,11 +22986,10 @@ rimraf.rimraf = rimraf;
 
 
 
-
-
  
 
-const diffDir = './snapshot-diff';
+const tempDir = external_os_default().tmpdir();
+const diffDir = external_path_default().join(tempDir, 'snapshot-diff');
 const tokenFromInput = (0,core.getInput)('token');
 const snapshotsDirectoryFromInput = (0,core.getInput)('snapshots-dir');
 const baseBranchNameFromInput = (0,core.getInput)('base-branch-name');
@@ -22999,9 +22998,6 @@ const prNumberFromInput = (0,core.getInput)('pr-number');
 const reviewRepoRemotePathFromInputFromInput = (0,core.getInput)('review-repo-remote-path') || '[STORYBOOK_REMOTE]';
 
 const octokit = (0,github.getOctokit)(tokenFromInput)
-
-// get temp directory
-const tempDir = external_os_default().tmpdir();
 
 console.log("Temp directory found:", tempDir);
 
