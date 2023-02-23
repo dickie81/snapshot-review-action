@@ -16843,6 +16843,11 @@ const run = async ({
   }
 
   external_node_fs_namespaceObject.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
+
+  const filesWritten = await glob_async(`${diffDir}/**`);
+
+  console.log('filesWritten', filesWritten);
+
   (0,core.setOutput)(filePaths);
 };
 
