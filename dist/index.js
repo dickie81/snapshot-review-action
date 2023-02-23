@@ -16756,8 +16756,10 @@ const execCommand = (command) =>
     });
   });
 
+const tempDir = external_node_os_namespaceObject.tmpdir();
+
 const run = async ({
-  tempDir = external_node_os_namespaceObject.tmpdir(),
+  tempDir,
   diffDir,
   tokenFromInput,
   snapshotsDirectoryFromInput,
@@ -16875,6 +16877,7 @@ const run = async ({
 };
 
 run({
+  tempDir,
   diffDir: external_node_path_namespaceObject.join(tempDir, 'snapshot-diff'),
   tokenFromInput: (0,core.getInput)('token'),
   snapshotsDirectoryFromInput: (0,core.getInput)('snapshots-dir'),
