@@ -49,7 +49,7 @@ export const run = async ({
 }) => {
   const octokit = getOctokit(tokenFromInput);
 
-  const filePaths = await octokit.pulls.listFiles({
+  const filePaths = await octokit.rest.pulls.listFiles({
     pull_number: prNumberFromInput,
     ...context.repo,
   });

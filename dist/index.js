@@ -16770,7 +16770,7 @@ const run = async ({
 }) => {
   const octokit = (0,github.getOctokit)(tokenFromInput);
 
-  const filePaths = await octokit.pulls.listFiles({
+  const filePaths = await octokit.rest.pulls.listFiles({
     pull_number: prNumberFromInput,
     ...github.context.repo,
   });
