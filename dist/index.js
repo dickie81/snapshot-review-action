@@ -16781,7 +16781,7 @@ const run = async ({
 
   const originUrl = await execCommand('git config --get remote.origin.url');
 
-  console.log('originUrl', originUrl, github.context.repository.html_url);
+  console.log('originUrl', originUrl, github.context.payload.repository.html_url);
 
   const origin = originUrl[0].split('.git')[0];
   const prLink = prNumberFromInput
