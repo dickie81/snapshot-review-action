@@ -14,31 +14,9 @@ import deleteDir from './util/delete-dir.js';
 
 const execPromise = promisify(exec);
 
-const execCommand = (command) =>
-  new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      if (stderr) {
-        reject(stderr);
-        return;
-      }
-
-      resolve(
-        stdout
-          .split('\n')
-          .map((filePath) => filePath.trim())
-          .filter((filePath) => !!filePath),
-      );
-    });
-  });
-
 const tempDir = os.tmpdir();
 
 export const run = async ({
-  tempDir,
   diffDir,
   tokenFromInput,
   snapshotsDirectoryFromInput,
@@ -58,14 +36,8 @@ export const run = async ({
 
   console.log('Found the following modified files:', filePaths);
 
-  const originUrl = await execCommand('git config --get remote.origin.url');
-
-  console.log('originUrl', originUrl, context.payload.repository.html_url);
-
-  const origin = originUrl[0].split('.git')[0];
-  const prLink = prNumberFromInput
-    ? `pull/${prNumberFromInput}`
-    : `tree/${branchNameFromInput}`;
+  const origin = context.payload.repository.html_url;
+  const prLink = `pull/${prNumberFromInput}`;
 
   await deleteDir(diffDir);
 
@@ -80,10 +52,6 @@ export const run = async ({
     const destName = destPathParsed.name;
 
     console.log('Creating dest directory:', destDir);
-
-    const { stdout } = await execPromise(`ls ${tempDir}`);
-
-    console.log('ls tempDir', stdout);
 
     const { data: origData } = await octokit.rest.repos.getContent({
       owner: 'dickie81',
