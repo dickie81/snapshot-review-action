@@ -16735,31 +16735,9 @@ rimraf.rimraf = rimraf;
 
 const execPromise = (0,external_node_util_namespaceObject.promisify)(external_node_child_process_namespaceObject.exec);
 
-const execCommand = (command) =>
-  new Promise((resolve, reject) => {
-    (0,external_node_child_process_namespaceObject.exec)(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      if (stderr) {
-        reject(stderr);
-        return;
-      }
-
-      resolve(
-        stdout
-          .split('\n')
-          .map((filePath) => filePath.trim())
-          .filter((filePath) => !!filePath),
-      );
-    });
-  });
-
 const tempDir = external_node_os_namespaceObject.tmpdir();
 
 const run = async ({
-  tempDir,
   diffDir,
   tokenFromInput,
   snapshotsDirectoryFromInput,
@@ -16779,14 +16757,8 @@ const run = async ({
 
   console.log('Found the following modified files:', filePaths);
 
-  const originUrl = await execCommand('git config --get remote.origin.url');
-
-  console.log('originUrl', originUrl, github.context.payload.repository.html_url);
-
-  const origin = originUrl[0].split('.git')[0];
-  const prLink = prNumberFromInput
-    ? `pull/${prNumberFromInput}`
-    : `tree/${branchNameFromInput}`;
+  const origin = github.context.payload.repository.html_url;
+  const prLink = `pull/${prNumberFromInput}`;
 
   await delete_dir(diffDir);
 
@@ -16801,10 +16773,6 @@ const run = async ({
     const destName = destPathParsed.name;
 
     console.log('Creating dest directory:', destDir);
-
-    const { stdout } = await execPromise(`ls ${tempDir}`);
-
-    console.log('ls tempDir', stdout);
 
     const { data: origData } = await octokit.rest.repos.getContent({
       owner: 'dickie81',
