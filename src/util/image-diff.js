@@ -52,13 +52,6 @@ export default (origImageBuff, comparisonImageBuff) => {
     rawCompImage.height !== rawOrigImage.height ||
     rawCompImage.width !== rawOrigImage.width;
 
-  const imageDimensions = {
-    receivedHeight: rawCompImage.height,
-    receivedWidth: rawCompImage.width,
-    baselineHeight: rawOrigImage.height,
-    baselineWidth: rawOrigImage.width,
-  };
-
   // Align images in size if different
   const [compImage, origImage] = hasSizeMismatch
     ? alignImagesToSameSize(rawCompImage, rawOrigImage)

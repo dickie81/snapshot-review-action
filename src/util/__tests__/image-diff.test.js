@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as url from 'node:url';
 
-import imageDiff from '../image-diff';
+import imageDiff from '../image-diff.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
