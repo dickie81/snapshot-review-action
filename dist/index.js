@@ -16770,16 +16770,18 @@ const run = async ({
 }) => {
   const octokit = (0,github.getOctokit)(tokenFromInput);
 
-  const filePaths = await octokit.rest.pulls.listFiles({
+  const { data } = await octokit.rest.pulls.listFiles({
     pull_number: prNumberFromInput,
     ...github.context.repo,
   });
+
+  const filePaths = data.map(({ filename }) => filename);
 
   console.log('Found the following modified files:', filePaths);
 
   const originUrl = await execCommand('git config --get remote.origin.url');
 
-  console.log('originUrl', originUrl, github.context);
+  console.log('originUrl', originUrl, github.context.repository.html_url);
 
   const origin = originUrl[0].split('.git')[0];
   const prLink = prNumberFromInput
