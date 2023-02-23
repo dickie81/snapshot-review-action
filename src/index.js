@@ -8,9 +8,9 @@ import { promisify } from 'node:util';
 import { getInput, setOutput, setFailed } from '@actions/core';
 import { getOctokit, context } from '@actions/github';
 
-import glob from 'glob';
-import { rimraf } from 'rimraf';
-import imageDiff from './util/image-diff';
+import imageDiff from './util/image-diff.js';
+import globAsync from './util/glob-async.js';
+import deleteDir from './util/delete-dir.js';
 
 const execPromise = promisify(exec);
 
@@ -32,19 +32,6 @@ const execCommand = (command) =>
           .map((filePath) => filePath.trim())
           .filter((filePath) => !!filePath),
       );
-    });
-  });
-
-const deleteDir = (dir) => rimraf(dir);
-
-const globAsync = (pattern) =>
-  new Promise((resolve, reject) => {
-    glob(pattern, (er, files) => {
-      if (er) {
-        reject(er);
-      }
-
-      resolve(files);
     });
   });
 
