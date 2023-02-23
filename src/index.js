@@ -122,6 +122,11 @@ export const run = async ({
   }
 
   fs.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
+
+  const filesWritten = await globAsync(`${diffDir}/**`);
+
+  console.log('filesWritten', filesWritten);
+
   setOutput(filePaths);
 };
 
