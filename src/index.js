@@ -35,8 +35,10 @@ const execCommand = (command) =>
     });
   });
 
+const tempDir = os.tmpdir();
+
 export const run = async ({
-  tempDir = os.tmpdir(),
+  tempDir,
   diffDir,
   tokenFromInput,
   snapshotsDirectoryFromInput,
@@ -154,6 +156,7 @@ export const run = async ({
 };
 
 run({
+  tempDir,
   diffDir: path.join(tempDir, 'snapshot-diff'),
   tokenFromInput: getInput('token'),
   snapshotsDirectoryFromInput: getInput('snapshots-dir'),
