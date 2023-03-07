@@ -23,7 +23,6 @@ export const run = async ({
   baseBranchNameFromInput,
   branchNameFromInput,
   prNumberFromInput,
-  reviewRepoRemotePathFromInputFromInput,
 }) => {
   const octokit = getOctokit(tokenFromInput);
 
@@ -35,9 +34,6 @@ export const run = async ({
   const filePaths = data.map(({ filename }) => filename);
 
   console.log('Found the following modified files:', filePaths);
-
-  const origin = context.payload.repository.html_url;
-  const prLink = `pull/${prNumberFromInput}`;
 
   await deleteDir(diffDir);
 
@@ -82,52 +78,16 @@ export const run = async ({
     }
   }
 
-  const readMe = [
-    `# Image snapshot diff files for [${branchNameFromInput}](${origin}/${prLink})`,
-    '',
-  ];
-  const newSnaps = [];
-  const updatedSnaps = [];
-
-  const dirs = await globAsync(`${diffDir}/**/`);
-
-  console.log('dirs', dirs);
-
-  for (let i = 0; i < dirs.length; i++) {
-    const dir = dirs[i];
-    const storyId = dir.split('/').pop();
-    const isNew = !!(await globAsync(`${dir}/*-new.png`)).length;
-    (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
-
-    fs.writeFileSync(
-      `${dir}/README.md`,
-      [
-        `# ${storyId}`,
-        ...(branchNameFromInput
-          ? [
-              '',
-              `[View in storybook](https://raw.githack.com/${reviewRepoRemotePathFromInputFromInput}/PR-${prNumberFromInput}-sb/index.html?path=/story/${storyId})`,
-            ]
-          : []),
-      ].join('\n'),
-    );
-  }
-
-  if (newSnaps.length) {
-    readMe.push('## New snapshots', ...newSnaps, '');
-  }
-
-  if (updatedSnaps.length) {
-    readMe.push('## Updated snapshots', ...updatedSnaps, '');
-  }
-
-  fs.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-
   const filesWritten = await globAsync(`${diffDir}/**`);
 
-  console.log('filesWritten', filesWritten);
+  console.log("files:", filesWritten);
 
-  setOutput(filePaths);
+  const child_process = require("child_process");
+  child_process.execSync(`zip -r diffs.zip *`, {
+    cwd: tempDir
+  });   
+
+  setOutput("diffs", filePaths);
 };
 
 run({
@@ -138,6 +98,4 @@ run({
   baseBranchNameFromInput: getInput('base-branch-name'),
   branchNameFromInput: getInput('branch-name'),
   prNumberFromInput: getInput('pr-number'),
-  reviewRepoRemotePathFromInputFromInput:
-    getInput('review-repo-remote-path') || '[STORYBOOK_REMOTE]',
 });
