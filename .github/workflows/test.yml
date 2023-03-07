@@ -14,7 +14,6 @@ jobs:
           base-branch-name: ${{ github.base_ref }}
           branch-name: ${{ github.head_ref }}
           pr-number: ${{ github.event.number }}
-          review-repo-remote-path: 'dickie81/snapshot-review-action-snaps'
 
 
  
