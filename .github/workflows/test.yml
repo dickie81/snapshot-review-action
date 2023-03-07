@@ -16,13 +16,13 @@ jobs:
           branch-name: ${{ github.head_ref }}
           pr-number: ${{ github.event.number }}
       - name: Save diff to file
-        run: echo ${{ steps.check-snapshots.outputs.diffs }} > diff.zip
+        run: echo ${{ steps.check-snapshots.outputs.diffs }} > diffs.zip
       - name: Archive diff zip file artifact
         uses: actions/upload-artifact@v3
         with:
-          name: diff.zip
+          name: diffs
           path: |
-            diff.zip
+            diffs.zip
 
 
  
