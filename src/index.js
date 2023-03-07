@@ -86,6 +86,8 @@ export const run = async ({
 
   const zipFilePath = path.join(tempDir, 'diffs.zip')
 
+  console.log("running:", `zip -r ${zipFilePath} ${diffDir}/**`);
+
   await execPromise(`zip -r ${zipFilePath} ${diffDir}/**`, {
     cwd: tempDir
   });
