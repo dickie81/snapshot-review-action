@@ -7,6 +7,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check snapshots
+        id: check-snapshots
         uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -14,6 +15,14 @@ jobs:
           base-branch-name: ${{ github.base_ref }}
           branch-name: ${{ github.head_ref }}
           pr-number: ${{ github.event.number }}
+      - name: Save diff to file
+        run: echo ${{ steps.nodejs.outputs.diffs }} > diff.zip
+      - name: Archive diff zip file artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: diff-zip
+          path: |
+            diff.zip
 
 
  

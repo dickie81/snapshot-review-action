@@ -72,7 +72,7 @@ export const run = async ({
       // diff detected
       await fs.promises.mkdir(destDir, { recursive: true });
       await fs.promises.writeFile(
-        path.join(destDir, destName),
+        path.join(destDir, `${destName}.png`),
         imageDiffResult.buffer,
       );
     }
@@ -82,12 +82,17 @@ export const run = async ({
 
   console.log("files:", filesWritten);
 
-  const child_process = require("child_process");
-  child_process.execSync(`zip -r diffs.zip *`, {
-    cwd: tempDir
-  });   
+  setOutput("changes", filesWritten);
 
-  setOutput("diffs", filePaths);
+  const zipFilePath = path.join(tempDir, 'diffs.zip')
+
+  await execPromise(`zip -r ${zipFilePath} ${diffDir}/**`, {
+    cwd: tempDir
+  });
+
+  const zipFileBuffer = fs.promises.readFile(zipFilePath);
+
+  setOutput("diffs", zipFileBuffer);
 };
 
 run({
