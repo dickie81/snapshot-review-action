@@ -16801,10 +16801,8 @@ const run = async ({
 
   console.log("files:", filesWritten);
 
-  console.log(github.context.repo);
-
   const readMe = [
-    `# Image snapshot diff files for [${branchNameFromInput}](${github.context.repo.origin}/${prNumberFromInput})`,
+    `# Image snapshot diff files for [${branchNameFromInput}](https://github.com${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumberFromInput})`,
     '',
   ];
   const newSnaps = [];
@@ -16818,7 +16816,7 @@ const run = async ({
     const isNew = !!(await glob_async(`${dir}/*-new.png`)).length;
     (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
 
-    await external_node_fs_namespaceObject.promises.writeFileSync(
+    await external_node_fs_namespaceObject.promises.writeFile(
       `${dir}/README.md`,
       [`# ${storyId}`].join('\n'),
     );
