@@ -80,6 +80,42 @@ export const run = async ({
 
   console.log("files:", filesWritten);
 
+  console.log(context.repo);
+
+  const readMe = [
+    `# Image snapshot diff files for [${branchNameFromInput}](${context.repo.origin}/${prNumberFromInput})`,
+    '',
+  ];
+  const newSnaps = [];
+  const updatedSnaps = [];
+
+  const dirs = await globAsync(`${diffDir}/**/`);
+
+  for (let i = 0; i < dirs.length; i++) {
+    const dir = dirs[i];
+    const storyId = dir.split('/').pop();
+    const isNew = !!(await globAsync(`${dir}/*-new.png`)).length;
+    (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
+
+    await fs.promises.writeFileSync(
+      `${dir}/README.md`,
+      [`# ${storyId}`].join('\n'),
+    );
+  }
+
+  if (newSnaps.length) {
+    readMe.push('## New snapshots', ...newSnaps, '');
+  }
+
+  if (updatedSnaps.length) {
+    readMe.push('## Updated snapshots', ...updatedSnaps, '');
+  }
+
+  console.log(readMe.join('\n'));
+
+  await fs.promises.writeFile(`${diffDir}/README.md`, readMe.join('\n'));
+
+
   setOutput("changes", filesWritten);
 };
 
