@@ -28,8 +28,6 @@ inputs:
 outputs:
   changes:
     description: JSON array with paths of all files with snapshot changes detected
-  diffs:
-    description: A zip file containing the snapshot diff images
 runs:
   using: 'node16'
   main: 'dist/index.js'
