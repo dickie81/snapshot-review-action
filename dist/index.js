@@ -16801,6 +16801,42 @@ const run = async ({
 
   console.log("files:", filesWritten);
 
+  console.log(github.context.repo);
+
+  const readMe = [
+    `# Image snapshot diff files for [${branchNameFromInput}](${github.context.repo.origin}/${prNumberFromInput})`,
+    '',
+  ];
+  const newSnaps = [];
+  const updatedSnaps = [];
+
+  const dirs = await glob_async(`${diffDir}/**/`);
+
+  for (let i = 0; i < dirs.length; i++) {
+    const dir = dirs[i];
+    const storyId = dir.split('/').pop();
+    const isNew = !!(await glob_async(`${dir}/*-new.png`)).length;
+    (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
+
+    await external_node_fs_namespaceObject.promises.writeFileSync(
+      `${dir}/README.md`,
+      [`# ${storyId}`].join('\n'),
+    );
+  }
+
+  if (newSnaps.length) {
+    readMe.push('## New snapshots', ...newSnaps, '');
+  }
+
+  if (updatedSnaps.length) {
+    readMe.push('## Updated snapshots', ...updatedSnaps, '');
+  }
+
+  console.log(readMe.join('\n'));
+
+  await external_node_fs_namespaceObject.promises.writeFile(`${diffDir}/README.md`, readMe.join('\n'));
+
+
   (0,core.setOutput)("changes", filesWritten);
 };
 
