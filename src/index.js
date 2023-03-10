@@ -50,15 +50,15 @@ export const run = async ({
     console.log('Creating dest directory:', destDir);
 
     const { data: origData } = await octokit.rest.repos.getContent({
-      owner: 'dickie81',
-      repo: 'snapshot-review-action',
+      // owner: 'dickie81',
+      // repo: 'snapshot-review-action',
       path: filePath,
       ref: baseBranchNameFromInput,
     });
 
     const { data: prData } = await octokit.rest.repos.getContent({
-      owner: 'dickie81',
-      repo: 'snapshot-review-action',
+      // owner: 'dickie81',
+      // repo: 'snapshot-review-action',
       path: filePath,
       ref: branchNameFromInput,
     });
