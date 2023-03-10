@@ -16744,7 +16744,6 @@ const run = async ({
   baseBranchNameFromInput,
   branchNameFromInput,
   prNumberFromInput,
-  reviewRepoRemotePathFromInputFromInput,
 }) => {
   const octokit = (0,github.getOctokit)(tokenFromInput);
 
@@ -16756,9 +16755,6 @@ const run = async ({
   const filePaths = data.map(({ filename }) => filename);
 
   console.log('Found the following modified files:', filePaths);
-
-  const origin = github.context.payload.repository.html_url;
-  const prLink = `pull/${prNumberFromInput}`;
 
   await delete_dir(diffDir);
 
@@ -16775,15 +16771,15 @@ const run = async ({
     console.log('Creating dest directory:', destDir);
 
     const { data: origData } = await octokit.rest.repos.getContent({
-      owner: 'dickie81',
-      repo: 'snapshot-review-action',
+      // owner: 'dickie81',
+      // repo: 'snapshot-review-action',
       path: filePath,
       ref: baseBranchNameFromInput,
     });
 
     const { data: prData } = await octokit.rest.repos.getContent({
-      owner: 'dickie81',
-      repo: 'snapshot-review-action',
+      // owner: 'dickie81',
+      // repo: 'snapshot-review-action',
       path: filePath,
       ref: branchNameFromInput,
     });
@@ -16797,58 +16793,29 @@ const run = async ({
       // diff detected
       await external_node_fs_namespaceObject.promises.mkdir(destDir, { recursive: true });
       await external_node_fs_namespaceObject.promises.writeFile(
-        external_node_path_namespaceObject.join(destDir, destName),
+        external_node_path_namespaceObject.join(destDir, `${destName}.png`),
         imageDiffResult.buffer,
       );
     }
   }
 
-  const readMe = [
-    `# Image snapshot diff files for [${branchNameFromInput}](${origin}/${prLink})`,
-    '',
-  ];
-  const newSnaps = [];
-  const updatedSnaps = [];
-
-  const dirs = await glob_async(`${diffDir}/**/`);
-
-  console.log('dirs', dirs);
-
-  for (let i = 0; i < dirs.length; i++) {
-    const dir = dirs[i];
-    const storyId = dir.split('/').pop();
-    const isNew = !!(await glob_async(`${dir}/*-new.png`)).length;
-    (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
-
-    external_node_fs_namespaceObject.writeFileSync(
-      `${dir}/README.md`,
-      [
-        `# ${storyId}`,
-        ...(branchNameFromInput
-          ? [
-              '',
-              `[View in storybook](https://raw.githack.com/${reviewRepoRemotePathFromInputFromInput}/PR-${prNumberFromInput}-sb/index.html?path=/story/${storyId})`,
-            ]
-          : []),
-      ].join('\n'),
-    );
-  }
-
-  if (newSnaps.length) {
-    readMe.push('## New snapshots', ...newSnaps, '');
-  }
-
-  if (updatedSnaps.length) {
-    readMe.push('## Updated snapshots', ...updatedSnaps, '');
-  }
-
-  external_node_fs_namespaceObject.writeFileSync(`${diffDir}/README.md`, readMe.join('\n'));
-
   const filesWritten = await glob_async(`${diffDir}/**`);
 
-  console.log('filesWritten', filesWritten);
+  console.log("files:", filesWritten);
 
-  (0,core.setOutput)(filePaths);
+  (0,core.setOutput)("changes", filesWritten);
+
+  const zipFilePath = external_node_path_namespaceObject.join(tempDir, 'diffs.zip')
+
+  console.log("running:", `zip -r ${zipFilePath} ${diffDir}/**`);
+
+  await execPromise(`zip -r ${zipFilePath} ${diffDir}/**`, {
+    cwd: tempDir
+  });
+
+  const zipFileBuffer = external_node_fs_namespaceObject.promises.readFile(zipFilePath);
+
+  (0,core.setOutput)("diffs", zipFileBuffer);
 };
 
 run({
@@ -16859,8 +16826,6 @@ run({
   baseBranchNameFromInput: (0,core.getInput)('base-branch-name'),
   branchNameFromInput: (0,core.getInput)('branch-name'),
   prNumberFromInput: (0,core.getInput)('pr-number'),
-  reviewRepoRemotePathFromInputFromInput:
-    (0,core.getInput)('review-repo-remote-path') || '[STORYBOOK_REMOTE]',
 });
 
 })();
