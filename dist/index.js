@@ -16771,15 +16771,13 @@ const run = async ({
     console.log('Creating dest directory:', destDir);
 
     const { data: origData } = await octokit.rest.repos.getContent({
-      // owner: 'dickie81',
-      // repo: 'snapshot-review-action',
+      ...github.context.repo,
       path: filePath,
       ref: baseBranchNameFromInput,
     });
 
     const { data: prData } = await octokit.rest.repos.getContent({
-      // owner: 'dickie81',
-      // repo: 'snapshot-review-action',
+      ...github.context.repo,
       path: filePath,
       ref: branchNameFromInput,
     });
