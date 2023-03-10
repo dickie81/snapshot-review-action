@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { promisify } from 'node:util';
 
-import { getInput, setOutput, setFailed } from '@actions/core';
+import { getInput, setOutput, setFailed, info } from '@actions/core';
 import { getOctokit, context } from '@actions/github';
 
 import imageDiff from './util/image-diff.js';
@@ -33,7 +33,7 @@ export const run = async ({
 
   const filePaths = data.map(({ filename }) => filename);
 
-  console.log('Found the following modified files:', filePaths);
+  info(`Found the following modified files: ${JSON.stringify(filePaths)}`);
 
   await deleteDir(diffDir);
 
@@ -47,7 +47,7 @@ export const run = async ({
     const destDir = destPathParsed.dir;
     const destName = destPathParsed.name;
 
-    console.log('Creating dest directory:', destDir);
+    info(`Creating dest directory: ${destDir}`);
 
     const { data: origData } = await octokit.rest.repos.getContent({
       ...context.repo,
@@ -81,18 +81,6 @@ export const run = async ({
   console.log("files:", filesWritten);
 
   setOutput("changes", filesWritten);
-
-  const zipFilePath = path.join(tempDir, 'diffs.zip')
-
-  console.log("running:", `zip -r ${zipFilePath} ${diffDir}/**`);
-
-  await execPromise(`zip -r ${zipFilePath} ${diffDir}/**`, {
-    cwd: tempDir
-  });
-
-  const zipFileBuffer = fs.promises.readFile(zipFilePath);
-
-  setOutput("diffs", zipFileBuffer);
 };
 
 run({

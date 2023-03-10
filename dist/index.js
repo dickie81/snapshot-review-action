@@ -16754,7 +16754,7 @@ const run = async ({
 
   const filePaths = data.map(({ filename }) => filename);
 
-  console.log('Found the following modified files:', filePaths);
+  (0,core.info)(`Found the following modified files: ${JSON.stringify(filePaths)}`);
 
   await delete_dir(diffDir);
 
@@ -16768,7 +16768,7 @@ const run = async ({
     const destDir = destPathParsed.dir;
     const destName = destPathParsed.name;
 
-    console.log('Creating dest directory:', destDir);
+    (0,core.info)(`Creating dest directory: ${destDir}`);
 
     const { data: origData } = await octokit.rest.repos.getContent({
       ...github.context.repo,
@@ -16802,18 +16802,6 @@ const run = async ({
   console.log("files:", filesWritten);
 
   (0,core.setOutput)("changes", filesWritten);
-
-  const zipFilePath = external_node_path_namespaceObject.join(tempDir, 'diffs.zip')
-
-  console.log("running:", `zip -r ${zipFilePath} ${diffDir}/**`);
-
-  await execPromise(`zip -r ${zipFilePath} ${diffDir}/**`, {
-    cwd: tempDir
-  });
-
-  const zipFileBuffer = external_node_fs_namespaceObject.promises.readFile(zipFilePath);
-
-  (0,core.setOutput)("diffs", zipFileBuffer);
 };
 
 run({
