@@ -80,10 +80,8 @@ export const run = async ({
 
   console.log("files:", filesWritten);
 
-  console.log(context.repo);
-
   const readMe = [
-    `# Image snapshot diff files for [${branchNameFromInput}](${context.repo.origin}/${prNumberFromInput})`,
+    `# Image snapshot diff files for [${branchNameFromInput}](https://github.com${context.repo.owner}/${context.repo.repo}/pull/${prNumberFromInput})`,
     '',
   ];
   const newSnaps = [];
@@ -97,7 +95,7 @@ export const run = async ({
     const isNew = !!(await globAsync(`${dir}/*-new.png`)).length;
     (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
 
-    await fs.promises.writeFileSync(
+    await fs.promises.writeFile(
       `${dir}/README.md`,
       [`# ${storyId}`].join('\n'),
     );
