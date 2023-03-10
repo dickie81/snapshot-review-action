@@ -15,14 +15,5 @@ jobs:
           base-branch-name: ${{ github.base_ref }}
           branch-name: ${{ github.head_ref }}
           pr-number: ${{ github.event.number }}
-      - name: Save diff to file
-        run: echo ${{ steps.check-snapshots.outputs.diffs }} > diffs.zip
-      - name: Archive diff zip file artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: diffs
-          path: |
-            diffs.zip
-
 
  

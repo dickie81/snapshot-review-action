@@ -16802,7 +16802,7 @@ const run = async ({
   console.log("files:", filesWritten);
 
   const readMe = [
-    `# Image snapshot diff files for [${branchNameFromInput}](https://github.com${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumberFromInput})`,
+    `# Image snapshot diff files for [${branchNameFromInput}](https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumberFromInput})`,
     '',
   ];
   const newSnaps = [];
@@ -16812,6 +16812,9 @@ const run = async ({
 
   for (let i = 0; i < dirs.length; i++) {
     const dir = dirs[i];
+
+    console.log(i, dir);
+
     const storyId = dir.split('/').pop();
     const isNew = !!(await glob_async(`${dir}/*-new.png`)).length;
     (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
