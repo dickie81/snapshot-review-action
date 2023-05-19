@@ -116,7 +116,6 @@ export const run = async ({
 
   await fs.promises.writeFile(`${diffDir}/README.md`, readMe.join('\n'));
 
-
   setOutput("changes", filesWritten);
 };
 
