@@ -7,9 +7,9 @@ import { promisify } from 'node:util';
 
 import { getInput, setOutput, setFailed, info } from '@actions/core';
 import { getOctokit, context } from '@actions/github';
+import { glob } from 'glob';
 
 import imageDiff from './util/image-diff.js';
-import globAsync from './util/glob-async.js';
 import deleteDir from './util/delete-dir.js';
 
 const execPromise = promisify(exec);
@@ -76,7 +76,7 @@ export const run = async ({
     }
   }
 
-  const filesWritten = await globAsync(`${diffDir}/**`);
+  const filesWritten = await glob(`${diffDir}/**`);
 
   console.log("files:", filesWritten);
 
@@ -87,7 +87,7 @@ export const run = async ({
   const newSnaps = [];
   const updatedSnaps = [];
 
-  const dirs = await globAsync(`${diffDir}/**/`);
+  const dirs = await glob(`${diffDir}/**/`);
 
   for (let i = 0; i < dirs.length; i++) {
     const dir = dirs[i];
@@ -95,7 +95,7 @@ export const run = async ({
     console.log(i, dir);
 
     const storyId = dir.split('/').pop();
-    const isNew = !!(await globAsync(`${dir}/*-new.png`)).length;
+    const isNew = !!(await glob(`${dir}/*-new.png`)).length;
     (isNew ? newSnaps : updatedSnaps).push(`- [${storyId}](./${storyId})`);
 
     await fs.promises.writeFile(
