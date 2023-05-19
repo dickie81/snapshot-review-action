@@ -1,12 +1,13 @@
 {
-  "name": "snapshot-review-action",
+  "name": "storybook-visual-review-action",
   "version": "0.0.0",
-  "description": "A GitHub action that publishes snapshot changes for review for any given PR",
+  "description": "A GitHub action that publishes storybook, runs snapshot tests & publishes any snapshot changes for review for any given PR",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "packager": "ncc build src/index.js --license LICENSE"
+    "packager": "ncc build src/index.js --license LICENSE",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "jest": "^29.4.3",
-    "prettier": "^2.8.4"
+    "prettier": "^2.8.4",
+    "husky": "^8.0.0"
   }
 }

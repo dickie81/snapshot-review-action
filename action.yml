@@ -29,5 +29,5 @@ outputs:
   changes:
     description: JSON array with paths of all files with snapshot changes detected
 runs:
-  using: 'node16'
+  using: 'node18'
   main: 'dist/index.js'
