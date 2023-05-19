@@ -20944,7 +20944,7 @@ const run = async ({
 
   const filesWritten = await glob(`${diffDir}/**`);
 
-  console.log("files: ", filesWritten);
+  console.log("files:", filesWritten);
 
   const readMe = [
     `# Image snapshot diff files for [${branchNameFromInput}](https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumberFromInput})`,
